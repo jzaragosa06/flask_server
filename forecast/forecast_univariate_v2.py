@@ -15,16 +15,20 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 
-from sklearn.model_selection import train_test_split
-
 # this is relative import
 # from seasonality_analysis import *
 from models.stacking import *
 
+from sklearn.model_selection import train_test_split
+
 
 def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
     df = df_arg.copy()
-    # get the model
+
+    # Ensure the DatetimeIndex has a frequency
+    df = df.asfreq(freq)
+
+    # Get the model
     stacking_regressor = build_staking_regressor()
 
     if forecast_method == "without_refit":
@@ -32,45 +36,24 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
             regressor=stacking_regressor, lags=lag_value, transformer_y=StandardScaler()
         )
 
-        # fit the model
+        # Fit the model
         forecaster.fit(df.iloc[:, -1])
 
-        # predict
+        # Predict
         pred = forecaster.predict(steps=steps_value)
 
-        # we need to handle the gaps
-        # we will solve it later
-
-        # we need to generate index for the predicted values.
+        # Generate index for the predicted values
         last_index = df.index[-1]
-        new_indices = []
+        new_indices = pd.date_range(
+            start=last_index, periods=steps_value + 1, freq=freq
+        )[1:]
 
-        # we add 1 since the range is exclusive on the upperbound.
-        for i in range(1, steps_value + 1):
-            if freq == "D":
-                new_index = last_index + pd.DateOffset(days=i)
-            elif freq == "W":
-                new_index = last_index + pd.DateOffset(weeks=i)
-            elif freq == "M":
-                new_index = last_index + pd.DateOffset(months=i)
-            elif freq == "Q":
-                new_index = last_index + pd.DateOffset(months=3 * i)
-            elif freq == "Y":
-                new_index = last_index + pd.DateOffset(years=i)
-            else:
-                raise ValueError(f"Frequency '{freq}' is not supported")
-
-            new_indices.append(new_index)
-
-        # converting the list to datetimeindex
-        new_indices = pd.DatetimeIndex(new_indices)
-
-        # then create a new dataframe of result
+        # Create a new DataFrame of the result
         forecast_df = pd.DataFrame(
             data=pred.values, index=new_indices, columns=["target"]
         )
-    else:
 
+    else:
         temp_data = df.copy()
         last_col = df.columns[-1]
 
@@ -81,8 +64,10 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
         pred_values = []
         pred_indices = []
 
+        last_index = temp_data.index[-1]  # Properly define last_index here
+
         for i in range(steps_value):
-            # fit
+            # Fit
             forecaster.fit(temp_data.iloc[:, -1])
 
             pred_i = pd.DataFrame(forecaster.predict(steps=1))
@@ -102,14 +87,17 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
                 raise ValueError(f"Frequency '{freq}' is not supported")
 
             pred_indices.append(new_index)
+            last_index = new_index  # Update last_index for the next iteration
 
-            temp_data.loc[pd.DatetimeIndex(new_index), last_col] = pred_i.iloc[0, 0]
+            temp_data.loc[new_index, last_col] = pred_i.iloc[0, 0]
 
         pred_indices = pd.DatetimeIndex(pred_indices)
-        # store as a dataframe
+        # Store as a DataFrame
         forecast_df = pd.DataFrame(
             data=pred_values, index=pred_indices, columns=["target"]
         )
+
+    return forecast_df
 
 
 def evaluate_model(
@@ -117,11 +105,14 @@ def evaluate_model(
 ):
     df = df_arg.copy()
 
+    # Ensure the DatetimeIndex has a frequency
+    df = df.asfreq(freq)
+
     test_size = 0.2
     test_samples = int(test_size * len(df))
-    train_data, test_data = df[:-test_samples], df[-test_samples]
+    train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
-    # get the model
+    # Get the model
     stacking_regressor = build_staking_regressor()
 
     forecaster = ForecasterAutoreg(
@@ -129,27 +120,25 @@ def evaluate_model(
     )
 
     if forecast_method == "without_refit":
-        # metrics and predictions are on the testing
+        # Metrics and predictions are on the testing
         metric, prediction = backtesting_forecaster(
             forecaster=forecaster,
-            y=df.iloc[:-1],
+            y=df.iloc[:, -1],
             initial_train_size=len(train_data),
-            steps=12,
+            steps=steps_value,
             refit=False,
             fixed_train_size=True,
             metric="mean_squared_error",
             n_jobs="auto",
             verbose=False,
         )
-
-        return metric, prediction
     else:
-        # metrics and predictions are on the testing
+        # Metrics and predictions are on the testing
         metric, prediction = backtesting_forecaster(
             forecaster=forecaster,
-            y=df.iloc[:-1],
+            y=df.iloc[:, -1],
             initial_train_size=len(train_data),
-            steps=12,
+            steps=steps_value,
             refit=True,
             fixed_train_size=False,
             metric="mean_squared_error",
@@ -157,4 +146,4 @@ def evaluate_model(
             verbose=False,
         )
 
-        return metric, prediction
+    return metric, prediction
