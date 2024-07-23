@@ -12,6 +12,8 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 
+from models.stacking import *
+
 def forecast_multi(df, lag_list, steps_value, freq, forecast_method='without_refit'):
     dict_lags = {}
     #dictionary of lags
@@ -20,7 +22,7 @@ def forecast_multi(df, lag_list, steps_value, freq, forecast_method='without_ref
 
     last_col = df.columns[-1]
     
-    stacking_regressor = build_stacking_regressor()
+    stacking_regressor = build_staking_regressor()
 
     if forecast_method == 'without_refit':
         forecaster = ForecasterAutoregMultiVariate(
