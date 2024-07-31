@@ -12,19 +12,21 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 
-from models.stacking import *
+# from models.stacking import *
+from models.stacking_multi import *
 
-def forecast_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):
+# def forecast_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):
+def forecast_multi(df_arg, dict_lags, steps_value, freq, forecast_method='without_refit'):
     df = df_arg.copy()
 
     #we'll just use the corresponding row number as index. 
     df = df.reset_index()
     df = df.drop(df.columns[0], axis = 1)
     
-    dict_lags = {}
-    #dictionary of lags
-    for i in range(len(df.columns)):
-        dict_lags[df.columns[i]] = int(lag_list[i])
+    # dict_lags = {}
+    # #dictionary of lags
+    # for i in range(len(df.columns)):
+    #     dict_lags[df.columns[i]] = int(lag_list[i])
 
     print(dict_lags)
     print(f"type of dic_lags: {type(dict_lags)}")
@@ -32,7 +34,7 @@ def forecast_multi(df_arg, lag_list, steps_value, freq, forecast_method='without
     #extract the last column as our target. 
     # last_col = df.columns[-1]
     
-    stacking_regressor = build_staking_regressor()
+    stacking_regressor = build_stacking_regressor_multi(df_arg=df_arg, dict_lags=dict_lags)
 
     if forecast_method == 'without_refit':
         forecaster = ForecasterAutoregMultiVariate(
@@ -68,7 +70,9 @@ def forecast_multi(df_arg, lag_list, steps_value, freq, forecast_method='without
         return forecast_df
 
 
-def evaluate_model_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):
+# def evaluate_model_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):
+def evaluate_model_multi(df_arg, dict_lags, steps_value, freq, forecast_method='without_refit'):
+
     df = df_arg.copy()
 
     # Ensure the DatetimeIndex has a frequency
@@ -77,10 +81,10 @@ def evaluate_model_multi(df_arg, lag_list, steps_value, freq, forecast_method='w
     df = df.reset_index()
     df = df.drop(df.columns[0], axis = 1)
 
-    dict_lags = {}
-    #dictionary of lags
-    for i in range(len(df.columns)):
-        dict_lags[df.columns[i]] = int(lag_list[i])
+    # dict_lags = {}
+    # #dictionary of lags
+    # for i in range(len(df.columns)):
+    #     dict_lags[df.columns[i]] = int(lag_list[i])
 
     test_size = 0.2
     test_samples = int(test_size * len(df))
@@ -88,7 +92,7 @@ def evaluate_model_multi(df_arg, lag_list, steps_value, freq, forecast_method='w
 
 
     # Get the model
-    stacking_regressor = build_staking_regressor()
+    stacking_regressor = build_stacking_regressor_multi(df_arg=df_arg, dict_lags=dict_lags)
 
     #then we need to built the forecaster. i.e., convert the regression model into forecasting model.
     if forecast_method == "without_refit":

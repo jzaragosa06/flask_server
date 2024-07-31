@@ -17,7 +17,8 @@ from sklearn.svm import SVR
 
 # this is relative import
 # from seasonality_analysis import *
-from models.stacking import *
+# from models.stacking import *
+from models.stacking_uni import *
 from utility.count_before_prior_gap import *
 
 from sklearn.model_selection import train_test_split
@@ -26,7 +27,8 @@ from sklearn.model_selection import train_test_split
 
 def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, interval_length_before_gap, forecast_method="without_refit"):
     df = df_arg.copy()
-    stacking_regressor = build_staking_regressor()
+    stacking_regressor = build_stacking_regressor_uni(
+    df_arg=df_arg, lag_value=lag_value)
 
     if forecast_method == "without_refit":
         #reset the index of the df to integer. 
@@ -174,7 +176,8 @@ def evaluate_model_uni_with_gap(
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
     # Get the model
-    stacking_regressor = build_staking_regressor()
+    stacking_regressor = build_stacking_regressor_uni(
+        df_arg=df_arg, lag_value=lag_value)
 
     forecaster = ForecasterAutoreg(
         regressor=stacking_regressor, lags=lag_value, transformer_y=StandardScaler()

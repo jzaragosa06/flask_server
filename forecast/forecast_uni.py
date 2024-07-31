@@ -17,7 +17,8 @@ from sklearn.svm import SVR
 
 # this is relative import
 # from seasonality_analysis import *
-from models.stacking import *
+# from models.stacking import *
+from models.stacking_uni import *
 
 from sklearn.model_selection import train_test_split
 
@@ -26,17 +27,17 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
     df = df_arg.copy()
 
     # Ensure the DatetimeIndex has a frequency
-    #this will fill the intermediate index. We shall not use this.
+    # this will fill the intermediate index. We shall not use this.
     # df = df.asfreq(freq)
 
-    #we'll just use the corresponding row number as index. 
+    # we'll just use the corresponding row number as index.
     df = df.reset_index()
-    df = df.drop(df.columns[0], axis = 1)
+    df = df.drop(df.columns[0], axis=1)
     print(df.head(5))
 
-
     # Get the model
-    stacking_regressor = build_staking_regressor()
+    stacking_regressor = build_stacking_regressor_uni(
+        df_arg=df_arg, lag_value=lag_value)
 
     if forecast_method == "without_refit":
         forecaster = ForecasterAutoreg(
@@ -51,8 +52,8 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
 
         # Generate index for the predicted values
         last_index = df_arg.index[-1]
-        #the result of this is just a date without time. While the function that take into account 
-        #the occurence of gap uses DateTimeIndex
+        # the result of this is just a date without time. While the function that take into account
+        # the occurence of gap uses DateTimeIndex
         new_indices = pd.date_range(
             start=last_index, periods=steps_value + 1, freq=freq
         )[1:]
@@ -62,7 +63,6 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
         forecast_df = pd.DataFrame(
             data=pred.values, index=new_indices, columns=["target"]
         )
-
 
     else:
         forecaster = ForecasterAutoreg(
@@ -78,14 +78,14 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
             pred_i_value = pred_i.iloc[0, 0]
             pred_values.append(pred_i_value)
 
-            #add the column value to the df
+            # add the column value to the df
             df.loc[len(df)] = pred_i_value
 
-        #then we generate the index. 
+        # then we generate the index.
         # Generate index for the predicted values
         last_index = df_arg.index[-1]
-        #the result of this is just a date without time. While the function that take into account 
-        #the occurence of gap uses DateTimeIndex
+        # the result of this is just a date without time. While the function that take into account
+        # the occurence of gap uses DateTimeIndex
         new_indices = pd.date_range(
             start=last_index, periods=steps_value + 1, freq=freq
         )[1:]
@@ -95,7 +95,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
         forecast_df = pd.DataFrame(
             data=pred_values, index=new_indices, columns=["target"]
         )
-        #======================================================================================
+        # ======================================================================================
 
     return forecast_df
 
@@ -107,16 +107,17 @@ def evaluate_model_uni(
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)
-    #we'll just use the corresponding row number as index. 
+    # we'll just use the corresponding row number as index.
     df = df.reset_index()
-    df = df.drop(df.columns[0], axis = 1)
+    df = df.drop(df.columns[0], axis=1)
 
     test_size = 0.2
     test_samples = int(test_size * len(df))
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
     # Get the model
-    stacking_regressor = build_staking_regressor()
+    stacking_regressor = build_stacking_regressor_uni(
+        df_arg=df_arg, lag_value=lag_value)
 
     forecaster = ForecasterAutoreg(
         regressor=stacking_regressor, lags=lag_value, transformer_y=StandardScaler()
@@ -149,14 +150,14 @@ def evaluate_model_uni(
             verbose=False,
         )
 
-    #then we generate the index. 
+    # then we generate the index.
     # Generate index for the predicted values
-    #number of last index on the train data. From there, we build the index of the test data. 
-    last_index = df_arg.index[len(train_data) -1]
-    #the result of this is just a date without time. While the function that take into account 
-    #the occurence of gap uses DateTimeIndex
-    
-    #the class predicts on the test data. so, the periods must be the lenght of the test data. 
+    # number of last index on the train data. From there, we build the index of the test data.
+    last_index = df_arg.index[len(train_data) - 1]
+    # the result of this is just a date without time. While the function that take into account
+    # the occurence of gap uses DateTimeIndex
+
+    # the class predicts on the test data. so, the periods must be the lenght of the test data.
     len_test_data = len(test_data)
     new_indices = pd.date_range(
         start=last_index, periods=len_test_data + 1, freq=freq
@@ -170,8 +171,3 @@ def evaluate_model_uni(
     )
 
     return metric, forecast_df
-
-
-
-    
-
