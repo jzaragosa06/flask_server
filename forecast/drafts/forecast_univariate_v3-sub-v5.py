@@ -18,14 +18,14 @@ from sklearn.svm import SVR
 # this is relative import
 # from seasonality_analysis import *
 from models.stacking import *
-from utility.count_before_prior_gap import *
+from utility.gap_functions import *
 
 from sklearn.model_selection import train_test_split
 
 
 
 def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, interval_length_before_gap, forecast_method="without_refit"):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
     stacking_regressor = build_staking_regressor()
 
     if forecast_method == "without_refit":   
@@ -161,7 +161,7 @@ def evaluate_model(
     df_arg, lag_value, steps_value, freq,  gap_length, interval_length_before_gap, forecast_method="without_refit"
 ):
     #We will use the  fifth and sixth argument to build the index. 
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)

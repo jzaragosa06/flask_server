@@ -25,7 +25,7 @@ from sklearn.model_selection import train_test_split
 
 #by default, it will be used to forecast the ts with no gap. 
 def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     #WE'LL JUST COMMENT THIS OUT FOR NOW. 
@@ -57,7 +57,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
         )
 
     else:
-        temp_data = df.copy()
+        temp_data = df.copy(deep = True)
         last_col = df.columns[-1]
 
         forecaster = ForecasterAutoreg(
@@ -104,7 +104,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
     return forecast_df
 
 def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, interval_length, forecast_method="without_refit"):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     #WE'LL JUST COMMENT THIS OUT FOR NOW. 
@@ -196,7 +196,7 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
         )
 
     else:
-        temp_data = df.copy()
+        temp_data = df.copy(deep = True)
         last_col = df.columns[-1]
 
         forecaster = ForecasterAutoreg(
@@ -264,7 +264,7 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
 def evaluate_model(
     df_arg, lag_value, steps_value, freq, forecast_method="without_refit"
 ):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     df = df.asfreq(freq)

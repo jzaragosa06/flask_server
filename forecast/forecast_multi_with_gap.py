@@ -14,11 +14,11 @@ from sklearn.svm import SVR
 
 # from models.stacking import *
 from models.stacking_multi import *
-from utility.count_before_prior_gap import * 
+from utility.gap_functions import * 
 
 # def forecast_multi_with_gap(df_arg, lag_list, steps_value, freq, gap_length, interval_length_before_gap, forecast_method='without_refit'):
 def forecast_multi_with_gap(df_arg, dict_lags, steps_value, freq, gap_length, interval_length_before_gap, forecast_method='without_refit'):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     #we'll just use the corresponding row number as index. 
     df = df.reset_index()
@@ -114,7 +114,7 @@ def forecast_multi_with_gap(df_arg, dict_lags, steps_value, freq, gap_length, in
 # def evaluate_model_multi_with_gap(df_arg, lag_list, steps_value, freq, gap_length, interval_length_before_gap,forecast_method='without_refit'):
 def evaluate_model_multi_with_gap(df_arg, dict_lags, steps_value, freq, gap_length, interval_length_before_gap,forecast_method='without_refit'):
 
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)

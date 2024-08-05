@@ -111,7 +111,7 @@ def forecast_uni_with_gap(df, lag_value, steps_value, freq, gap_length, interval
         return forecast_df
 
     else:
-        temp_df = df.copy()
+        temp_df = df.copy(deep = True)
         #last datetime  index
         last_index = df.index[-1]
 

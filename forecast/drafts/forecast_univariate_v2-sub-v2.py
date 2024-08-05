@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 
 
 def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     #this will fill the intermediate index. We shall not use this.
@@ -100,7 +100,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
 def evaluate_model(
     df_arg, lag_value, steps_value, freq, forecast_method="without_refit"
 ):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)

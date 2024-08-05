@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 
 
 def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     df = df.asfreq(freq)
@@ -54,7 +54,7 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
         )
 
     else:
-        temp_data = df.copy()
+        temp_data = df.copy(deep = True)
         last_col = df.columns[-1]
 
         forecaster = ForecasterAutoreg(
@@ -103,7 +103,7 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
 def evaluate_model(
     df_arg, lag_value, steps_value, freq, forecast_method="without_refit"
 ):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     df = df.asfreq(freq)

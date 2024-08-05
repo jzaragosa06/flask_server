@@ -17,7 +17,7 @@ from models.stacking_multi import *
 
 # def forecast_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):
 def forecast_multi(df_arg, dict_lags, steps_value, freq, forecast_method='without_refit'):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     #we'll just use the corresponding row number as index. 
     df = df.reset_index()
@@ -73,7 +73,7 @@ def forecast_multi(df_arg, dict_lags, steps_value, freq, forecast_method='withou
 # def evaluate_model_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):
 def evaluate_model_multi(df_arg, dict_lags, steps_value, freq, forecast_method='without_refit'):
 
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)

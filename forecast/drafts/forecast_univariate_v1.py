@@ -23,7 +23,7 @@ from models.stacking import *
 
 
 def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
     # get the model
     stacking_regressor = build_staking_regressor()
 
@@ -71,7 +71,7 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
         )
     else:
 
-        temp_data = df.copy()
+        temp_data = df.copy(deep = True)
         last_col = df.columns[-1]
 
         forecaster = ForecasterAutoreg(
@@ -115,7 +115,7 @@ def forcast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_r
 def evaluate_model(
     df_arg, lag_value, steps_value, freq, forecast_method="without_refit"
 ):
-    df = df_arg.copy()
+    df = df_arg.copy(deep = True)
 
     test_size = 0.2
     test_samples = int(test_size * len(df))

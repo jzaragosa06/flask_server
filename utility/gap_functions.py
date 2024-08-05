@@ -1,4 +1,36 @@
 import pandas as pd
+import numpy as np
+
+
+def compute_count_before(df, freq, interval_length_before_gap):
+    count_before = 0
+    temp = interval_length_before_gap
+    i = len(df) - 1
+
+    while i > 0 and temp > 0:
+        diff = df.index[i] - df.index[i - 1]
+
+        if freq == 'D' and diff.days != 1:
+              count_before += 1
+              break
+        elif freq == 'W' and diff.days != 7:
+              count_before += 1
+              break
+        elif freq == 'M' and (df.index[i].month == df.index[i - 1].month or diff.days > 31):
+              count_before += 1
+              break
+        elif freq == 'Q' and (df.index[i].quarter == df.index[i - 1].quarter or diff.days > 93):
+              count_before += 1
+              break
+        elif freq == 'Y' and df.index[i].year == df.index[i - 1].year:
+              count_before += 1
+              break
+        count_before += 1
+        temp -= 1
+        i -= 1
+
+    return count_before
+
 
 def identify_gap(df, freq):
     if freq == "D":
@@ -61,3 +93,32 @@ def identify_gap(df, freq):
       interval_length = (end_interval - start_interval).days / 7
 
       return gap_length, interval_length
+
+def checkGap(df, freq):
+    #let assume that there is no gap
+    hasGap = False
+    
+    if freq == "D":
+        for i in range(1, len(df)):
+            diff = df.index[i] - df.index[i-1]
+            
+            if diff.days != 1:
+                #negate the assumption
+                hasGap = True
+                break
+        
+    elif freq == "W":
+        for i in range(1, len(df)):
+            diff = df.index[i] - df.index[i-1]
+            
+            if diff.days != 7:
+                #negate the assumption
+                hasGap = True
+                break
+    elif freq == "M":
+        ...
+    
+    #return
+    return hasGap
+    
+    
