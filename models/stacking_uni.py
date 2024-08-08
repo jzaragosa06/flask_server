@@ -101,8 +101,26 @@ def optimize_base_models_uni(df_arg, lag_value):
         
 
 def build_stacking_regressor_uni(df_arg, lag_value):
-    # basically, this is a list of tuples, where each tuple contains  2 elements.
-    base_estimators = optimize_base_models_uni(df_arg = df_arg, lag_value=lag_value)
+    # # basically, this is a list of tuples, where each tuple contains  2 elements.
+    # base_estimators = optimize_base_models_uni(df_arg = df_arg, lag_value=lag_value)
+
+    # # Initialize stacking regressor with a linear regression meta-estimator
+    # stacking_regressor = StackingRegressor(
+    #     estimators=base_estimators,
+    #     final_estimator=LinearRegression()
+    # )
+
+    # return stacking_regressor
+
+    #=======================================================================================
+
+    base_estimators = [
+        ('lr', LinearRegression()),
+        ('rf', RandomForestRegressor(n_estimators=50, random_state=42)),
+        ('svr', SVR(kernel='sigmoid', C=100, gamma=0.5),),
+        ('gbr', GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=7, min_samples_split=5, min_samples_leaf=2))
+        
+    ]
 
     # Initialize stacking regressor with a linear regression meta-estimator
     stacking_regressor = StackingRegressor(

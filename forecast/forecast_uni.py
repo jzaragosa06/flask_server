@@ -14,13 +14,15 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
+from sklearn.model_selection import train_test_split
+
 
 # this is relative import
 # from seasonality_analysis import *
 # from models.stacking import *
 from models.stacking_uni import *
 
-from sklearn.model_selection import train_test_split
+
 
 
 def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
