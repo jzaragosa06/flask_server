@@ -32,26 +32,28 @@ from statsmodels.tsa.seasonal import STL
 #         return seasonal_df
 
 
-
 def compute_seasonality(df_arg, ts_type="univariate"):
     # we need to extract the period of the variable
     if ts_type == "univariate":
-        df = df_arg.copy(deep = True)
+        df = df_arg.copy(deep=True)
         period = 12  # we need to compute for this
-        
+
         try:
             stl = STL(df.iloc[:, -1])
             result = stl.fit()
             seasonal_df = pd.DataFrame(
-                data=result.seasonal.values, index=result.seasonal.index, columns=["target"]
+                data=result.seasonal.values,
+                index=result.seasonal.index,
+                columns=["target"],
             )
+            print(type(seasonal_df))
             return seasonal_df
         except Exception as e:
             print(f"Error in STL decomposition: {e}")
             return None  # or handle it in another appropriate way
 
     else:
-        df = df_arg.copy(deep = True)
+        df = df_arg.copy(deep=True)
         period = []
         seasonal_df = pd.DataFrame()
 
@@ -63,9 +65,9 @@ def compute_seasonality(df_arg, ts_type="univariate"):
                     seasonal_df[f"feature_{i}"] = pd.DataFrame(result.seasonal)
                 except Exception as e:
                     print(f"Error in STL decomposition for column {i}: {e}")
-                    seasonal_df[f"feature_{i}"] = pd.Series([np.nan] * len(df), index=df.index)
+                    seasonal_df[f"feature_{i}"] = pd.Series(
+                        [np.nan] * len(df), index=df.index
+                    )
 
+        print(type(seasonal_df))
         return seasonal_df
-    
-    
-    
