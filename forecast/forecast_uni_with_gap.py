@@ -15,9 +15,6 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 
-# this is relative import
-# from seasonality_analysis import *
-# from models.stacking import *
 from models.stacking_uni import *
 from utility.gap_functions import *
 
