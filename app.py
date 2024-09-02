@@ -251,11 +251,5 @@ def handle_submit():
         return jsonify({"message": f"Error in preparing response: {e}"}), 500
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True, use_reloader=False)
-
-# if __name__ == "__main__":
-#     app.run(debug=True, use_reloader=False)
-
 if __name__ == "__main__":
     app.run(debug=True)
