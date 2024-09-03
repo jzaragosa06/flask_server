@@ -9,11 +9,9 @@ def fillMissing(df):
 
 
 def prepare_trend_response(
-    df_arg,
     tsType,
     trend_result,
 ):
-    df = df_arg.copy(deep=True)
     
     trend_dict = fillMissing(trend_result).to_dict(orient="list")
     trend_dict["index"] = [
@@ -21,15 +19,9 @@ def prepare_trend_response(
         for date in pd.to_datetime(trend_result.index).to_list()
     ]
     
-    df_dict = fillMissing(df).to_dict(orient="list")
-    df_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
-    ]
-    
     response = {
         "tstype": tsType,
         "trend": trend_dict,
-        "entire_data": df_dict,
     }
     
     return response

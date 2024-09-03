@@ -244,10 +244,10 @@ def trend():
         tsType = request.form.get("type")
 
         # extract trend and seasonality behaviour of the ts data.
-        trend_result = compute_sma(df_arg=df, ts_type=tsType)
+        trend_result = compute_sma(df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
 
         response = prepare_trend_response(
-            df_arg=df, tsType=tsType, trend_result=trend_result
+            tsType=tsType, trend_result=trend_result
         )
 
         print(response)
