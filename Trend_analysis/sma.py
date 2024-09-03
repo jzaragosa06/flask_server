@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 
 
-def compute_sma(df_arg, window_size, ts_type="univariate"):
+def compute_sma(df_arg, ts_type="univariate"):
     df = df_arg.copy(deep=True)
+    window_size = 10
 
     if ts_type == "univariate":
         window_size = window_size
