@@ -245,6 +245,7 @@ def handle_submit():
         print(response_json)
         # return jsonify(response_json)
 
+        
         return Response(json.dumps(response_json), mimetype="application/json")
     except Exception as e:
         print(f"Error in preparing response: {e}")

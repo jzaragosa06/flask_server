@@ -9,44 +9,54 @@ def fillMissing(df):
 
 
 def prepare_trend_response(
+    df_arg,
     tsType,
     trend_result,
 ):
-    
+    df = df_arg.copy(deep=True)
+
+    if tsType == "univariate":
+        colname = df.columns[0]
+    else:
+        colname = df.columns.tolist()
+
     trend_dict = fillMissing(trend_result).to_dict(orient="list")
     trend_dict["index"] = [
         date.strftime("%m/%d/%Y")
         for date in pd.to_datetime(trend_result.index).to_list()
     ]
-    
+
     response = {
         "tstype": tsType,
         "trend": trend_dict,
+        "colname": colname,
     }
-    
+
     return response
+
 
 def prepare_seasonality_response(df_arg, tsType, seasonal_result):
     df = df_arg.copy(deep=True)
-    
+
     df_dict = fillMissing(df).to_dict(orient="list")
     df_dict["index"] = [
         date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
     ]
-    
+
     seasonality_dict = fillMissing(seasonal_result).to_dict(orient="list")
     seasonality_dict["index"] = [
         date.strftime("%m/%d/%Y")
         for date in pd.to_datetime(seasonal_result.index).to_list()
     ]
-    
+
     response = {
         "tstype": tsType,
         "seasonality": seasonality_dict,
         "entire_data": df_dict,
     }
-    
+
     return response
+
 
 def prepare_forecast_response(
     df_arg,
@@ -113,8 +123,3 @@ def prepare_forecast_response(
     }
 
     return response
-
-    
-    
-    
-    

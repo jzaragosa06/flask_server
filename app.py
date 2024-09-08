@@ -121,7 +121,7 @@ def forecast_univariate():
                     interval_length_before_gap=interval_length,
                     forecast_method="with_refit",
                 )
-        try: 
+        try:
             response = prepare_forecast_response(
                 df_arg=df,
                 tsType=tsType,
@@ -133,19 +133,17 @@ def forecast_univariate():
                 pred_test=pred_test,
                 pred_out=pred_out,
             )
-
+            print(response)
             return Response(json.dumps(response), mimetype="application/json")
         except Exception as e:
             print(f"Error in preparing response: {e}")
             return jsonify({"message": f"Error in preparing response: {e}"}), 500
 
-                    
-
 
 @app.route("/forecast-multivariate", methods=["POST"])
-def forecast_multivariate():    
+def forecast_multivariate():
     file = request.files["inputFile"]
-    
+
     if file:
         try:
             df = pd.read_csv(file, index_col=0, parse_dates=True)
@@ -159,7 +157,6 @@ def forecast_multivariate():
         description = request.form.get("description")
         steps = request.form.get("steps")
         forecastMethod = request.form.get("method")
-
 
         dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
 
@@ -188,7 +185,7 @@ def forecast_multivariate():
         else:
             if forecastMethod == "without_refit":
                 gap_length, interval_length = identify_gap(df=df, freq=freq)
-                
+
                 metric, pred_test = evaluate_model_multi_with_gap(
                     df_arg=df,
                     dict_lags=dict_lags,
@@ -223,6 +220,7 @@ def forecast_multivariate():
                 pred_out=pred_out,
             )
 
+            print(response)
             return Response(json.dumps(response), mimetype="application/json")
         except Exception as e:
             print(f"Error in preparing response: {e}")
@@ -246,9 +244,7 @@ def trend():
         # extract trend and seasonality behaviour of the ts data.
         trend_result = compute_sma(df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
 
-        response = prepare_trend_response(
-            tsType=tsType, trend_result=trend_result
-        )
+        response = prepare_trend_response(df_arg=df, tsType=tsType, trend_result=trend_result)
 
         print(response)
         return Response(json.dumps(response), mimetype="application/json")

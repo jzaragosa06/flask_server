@@ -30,9 +30,10 @@
 import pandas as pd
 import numpy as np
 
+
 def compute_sma(df_arg, ts_type="univariate", window_sizes=[5, 10, 20]):
     df = df_arg.copy(deep=True)
-    sma_df = df.copy()
+    sma_df = df_arg.copy(deep=True)
 
     for window_size in window_sizes:
         if ts_type == "univariate":
@@ -46,5 +47,3 @@ def compute_sma(df_arg, ts_type="univariate", window_sizes=[5, 10, 20]):
                 sma_df[f"{column_name}_sma_{window_size}"] = sma
 
     return sma_df
-
-
