@@ -100,7 +100,20 @@ def prepare_forecast_response(
         date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
     ]
 
-    print(f"metric: {metric}")
+    # metric_type = type(metric)
+    # print(f" the metric is : {metric}")
+    # print(f" the metric is val : {metric.values}")
+    # print(f" the metric is : {metric_type}")
+
+    # Check the type of metric
+    if isinstance(metric, pd.DataFrame):
+        # Extract the single metric value for multivariate (assuming the metric is in the first row/column)
+        metric_value = metric.iloc[
+            0, 1
+        ]  # Extracts the value from the first row and second column
+    else:
+        # Univariate case, just a float value
+        metric_value = metric
 
     response = {
         "metadata": {
@@ -113,7 +126,7 @@ def prepare_forecast_response(
         "forecast": {
             "pred_out": pred_out_dict,
             "pred_test": pred_test_dict,
-            # "metric": metric.values
+            "metric": metric_value,
         },
         "data": {
             "train_data": train_data_dict,
