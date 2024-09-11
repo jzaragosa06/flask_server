@@ -1,9 +1,8 @@
-
-
 import pandas as pd
 import numpy as np
 
-def detect_trend_periods(time_series):
+
+def detect_changes_in_series(time_series):
     trend_periods = []
     current_trend = None
     trend_start_index = None
@@ -12,19 +11,29 @@ def detect_trend_periods(time_series):
     for i in range(1, len(time_series)):
         if current_trend is None:  # Start of a new trend period
             if time_series.iloc[i, 0] > time_series.iloc[i - 1, 0]:
-                current_trend = 'Upward'
+                current_trend = "Upward"
             elif time_series.iloc[i, 0] < time_series.iloc[i - 1, 0]:
-                current_trend = 'Downward'
+                current_trend = "Downward"
             else:
                 continue  # No change, continue to the next iteration
             trend_start_index = time_series.index[i]
 
         # Check if the trend continues
-        if current_trend == 'Upward' and time_series.iloc[i, 0] < time_series.iloc[i - 1, 0]:
-            trend_periods.append((trend_start_index, time_series.index[i - 1], 'Upward'))
+        if (
+            current_trend == "Upward"
+            and time_series.iloc[i, 0] < time_series.iloc[i - 1, 0]
+        ):
+            trend_periods.append(
+                (trend_start_index, time_series.index[i - 1], "Upward")
+            )
             current_trend = None
-        elif current_trend == 'Downward' and time_series.iloc[i, 0] > time_series.iloc[i - 1, 0]:
-            trend_periods.append((trend_start_index, time_series.index[i - 1], 'Downward'))
+        elif (
+            current_trend == "Downward"
+            and time_series.iloc[i, 0] > time_series.iloc[i - 1, 0]
+        ):
+            trend_periods.append(
+                (trend_start_index, time_series.index[i - 1], "Downward")
+            )
             current_trend = None
 
     # Check for an ongoing trend at the end of the time series
@@ -32,3 +41,15 @@ def detect_trend_periods(time_series):
         trend_periods.append((trend_start_index, time_series.index[-1], current_trend))
 
     return trend_periods
+
+
+def convert_behavior_to_sentence(ts_change):
+    behaviorRaw = ""
+    for change in ts_change:
+        start, end, trend = change
+        duration = (end - start).days + 1
+
+        temp = f"{trend} change from {start} to {end}, for around {duration} days."
+        behaviorRaw = behaviorRaw + " " + temp
+
+    return behaviorRaw

@@ -244,7 +244,9 @@ def trend():
         # extract trend and seasonality behaviour of the ts data.
         trend_result = compute_sma(df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
 
-        response = prepare_trend_response(df_arg=df, tsType=tsType, trend_result=trend_result)
+        response = prepare_trend_response(
+            df_arg=df, tsType=tsType, trend_result=trend_result
+        )
 
         print(response)
         return Response(json.dumps(response), mimetype="application/json")

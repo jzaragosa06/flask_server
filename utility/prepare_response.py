@@ -4,8 +4,42 @@ from flask import Flask, request, jsonify
 import io
 
 
+from behavior.extract_behavior import *
+from llm.gemini_pro_text import *
+
+
 def fillMissing(df):
     return df.fillna("")
+
+
+# def prepare_trend_response(
+
+#     df_arg,
+#     tsType,
+#     trend_result,
+# ):
+#     df = df_arg.copy(deep=True)
+
+#     if tsType == "univariate":
+#         colname = df.columns[0]
+
+
+#     else:
+#         colname = df.columns.tolist()
+
+#     trend_dict = fillMissing(trend_result).to_dict(orient="list")
+#     trend_dict["index"] = [
+#         date.strftime("%m/%d/%Y")
+#         for date in pd.to_datetime(trend_result.index).to_list()
+#     ]
+
+#     response = {
+#         "tstype": tsType,
+#         "trend": trend_dict,
+#         "colname": colname,
+#     }
+
+#     return response
 
 
 def prepare_trend_response(
@@ -16,9 +50,23 @@ def prepare_trend_response(
     df = df_arg.copy(deep=True)
 
     if tsType == "univariate":
-        colname = df.columns[0]
+        colnames = df.columns[0]
+
+        # here, we will extract the forecast explanation
+        behaviorRaw = detect_changes_in_series(time_series=df)
+        explanation = explainTrendBehavior(behaviorRaw=behaviorRaw)
+
     else:
-        colname = df.columns.tolist()
+        colnames = df.columns.tolist()
+
+        explanation = {}
+
+        for colname in colnames:
+            temp_df = pd.DataFrame(df[colname])
+            behaviorRaw = detect_changes_in_series(time_series=temp_df)
+            explanation_text = explainTrendBehavior(behaviorRaw=behaviorRaw)
+
+            explanation[colname] = explanation_text
 
     trend_dict = fillMissing(trend_result).to_dict(orient="list")
     trend_dict["index"] = [
@@ -29,10 +77,13 @@ def prepare_trend_response(
     response = {
         "tstype": tsType,
         "trend": trend_dict,
-        "colname": colname,
+        "explanations": explanation,
+        "colname": colnames,
     }
 
     return response
+
+
 
 
 def prepare_seasonality_response(df_arg, tsType, seasonal_result):
@@ -100,6 +151,12 @@ def prepare_forecast_response(
         date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
     ]
 
+    # here, we will extract the forecast explanation
+    behaviorRaw = detect_changes_in_series(time_series=pred_out)
+    explanation = explainForecastBehavior(behaviorRaw=behaviorRaw)
+
+    print(f"here is the explanation: {explanation}")
+
     # metric_type = type(metric)
     # print(f" the metric is : {metric}")
     # print(f" the metric is val : {metric.values}")
@@ -115,6 +172,11 @@ def prepare_forecast_response(
         # Univariate case, just a float value
         metric_value = metric
 
+    if tsType == "univariate":
+        colnames = df.columns[0]
+    else:
+        colnames = df.columns.tolist()
+
     response = {
         "metadata": {
             "tstype": tsType,
@@ -122,10 +184,12 @@ def prepare_forecast_response(
             "description": description,
             "steps": steps,
             "forecast_method": forecastMethod,
+            "colname": colnames,
         },
         "forecast": {
             "pred_out": pred_out_dict,
             "pred_test": pred_test_dict,
+            "pred_out_explanation": explanation,
             "metric": metric_value,
         },
         "data": {

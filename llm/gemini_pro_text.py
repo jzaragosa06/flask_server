@@ -19,9 +19,9 @@ api_key = "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs"
 genai.configure(api_key=api_key)
 
 
-def explainForecastBehavior(behaviorRaw, context):
+def explainForecastBehavior(behaviorRaw):
     response = model.generate_content(
-        f"This is a forecast. Explain the behavior of the time series forecast: {behaviorRaw}. Explain this in one paragraph"
+        f"This is a forecast. Explain the behavior of the time series forecast: {behaviorRaw}. Explain this in one paragraph. use future tense, since this is a forecast. describe this as a report."
     )
 
     # print(to_markdown(response.text))
@@ -29,9 +29,9 @@ def explainForecastBehavior(behaviorRaw, context):
     return response.text
 
 
-def explainTrendBehavior(behaviorRaw, context):
+def explainTrendBehavior(behaviorRaw):
     response = model.generate_content(
-        f"This is a trend. Explain the behavior of the trend of time series: {behaviorRaw}. Explain this in one paragraph"
+        f"This is a trend. Explain the behavior of the trend of time series: {behaviorRaw}. Explain this in one paragraph. use future tense. describe this as a report."
     )
 
     # print(to_markdown(response.text))
@@ -39,7 +39,7 @@ def explainTrendBehavior(behaviorRaw, context):
     return response.text
 
 
-def explainSeasonalityBehavior(behaviorRaw, context):
+def explainSeasonalityBehavior(behaviorRaw):
     response = model.generate_content(
         f"This is a seasonality. Explain the behavior of the seasonality of time series: {behaviorRaw}. Explain this in one paragraph"
     )

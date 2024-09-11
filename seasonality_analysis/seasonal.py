@@ -31,12 +31,15 @@ from statsmodels.tsa.seasonal import STL
 
 #         return seasonal_df
 
+import pandas as pd
+import numpy as np
+from statsmodels.tsa.seasonal import STL
+
 
 def compute_seasonality(df_arg, ts_type="univariate"):
     # we need to extract the period of the variable
     if ts_type == "univariate":
         df = df_arg.copy(deep=True)
-        period = 12  # we need to compute for this
 
         try:
             stl = STL(df.iloc[:, -1])
