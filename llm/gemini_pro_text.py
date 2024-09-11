@@ -12,7 +12,6 @@ def to_markdown(text):
     text = text.replace(":", " *")
     return Markdown(textwrap.indent(text, "> ", predicate=lambda _: True))
 
-
 model = genai.GenerativeModel("gemini-pro")
 
 api_key = "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs"

@@ -20,6 +20,7 @@ def forecast_multi(
     df_arg, dict_lags, steps_value, freq, forecast_method="without_refit"
 ):
     df = df_arg.copy(deep=True)
+    colname = df.columns[-1]
 
     # we'll just use the corresponding row number as index.
     df = df.reset_index()
@@ -69,7 +70,7 @@ def forecast_multi(
 
         # Create a new DataFrame of the result
         forecast_df = pd.DataFrame(
-            data=pred.values, index=new_indices, columns=["target"]
+            data=pred.values, index=new_indices, columns=[f"{colname}"]
         )
 
         return forecast_df
@@ -80,6 +81,7 @@ def evaluate_model_multi(
     df_arg, dict_lags, steps_value, freq, forecast_method="without_refit"
 ):
     df = df_arg.copy(deep=True)
+    colname = df.columns[-1]
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)
@@ -139,7 +141,7 @@ def evaluate_model_multi(
 
         # Create a new DataFrame of the result
         forecast_df = pd.DataFrame(
-            data=predictions.values, index=new_indices, columns=["target"]
+            data=predictions.values, index=new_indices, columns=[f"{colname}"]
         )
 
         return metric, forecast_df

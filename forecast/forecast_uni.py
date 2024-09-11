@@ -27,15 +27,13 @@ from models.stacking_uni import *
 
 def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
     df = df_arg.copy(deep = True)
+    
+    colname = df.columns[0]
 
-    # Ensure the DatetimeIndex has a frequency
-    # this will fill the intermediate index. We shall not use this.
-    # df = df.asfreq(freq)
 
     # we'll just use the corresponding row number as index.
     df = df.reset_index()
     df = df.drop(df.columns[0], axis=1)
-    print(df.head(5))
 
     # Get the model
     stacking_regressor = build_stacking_regressor_uni(
@@ -63,7 +61,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
 
         # Create a new DataFrame of the result
         forecast_df = pd.DataFrame(
-            data=pred.values, index=new_indices, columns=["target"]
+            data=pred.values, index=new_indices, columns=[f"{colname}"]
         )
 
     else:
@@ -95,7 +93,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
 
         # Create a new DataFrame of the result
         forecast_df = pd.DataFrame(
-            data=pred_values, index=new_indices, columns=["target"]
+            data=pred_values, index=new_indices, columns=[f"{colname}"]
         )
         # ======================================================================================
 
@@ -106,6 +104,7 @@ def evaluate_model_uni(
     df_arg, lag_value, steps_value, freq, forecast_method="without_refit"
 ):
     df = df_arg.copy(deep = True)
+    colname = df.columns[0]
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)
@@ -169,7 +168,7 @@ def evaluate_model_uni(
 
     # Create a new DataFrame of the result
     forecast_df = pd.DataFrame(
-        data=predictions.values, index=new_indices, columns=["target"]
+        data=predictions.values, index=new_indices, columns=[f"{colname}"]
     )
 
     return metric, forecast_df

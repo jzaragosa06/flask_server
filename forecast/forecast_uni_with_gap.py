@@ -24,6 +24,7 @@ from sklearn.model_selection import train_test_split
 
 def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, interval_length_before_gap, forecast_method="without_refit"):
     df = df_arg.copy(deep = True)
+    colname = df.columns[0]
     stacking_regressor = build_stacking_regressor_uni(
     df_arg=df_arg, lag_value=lag_value)
 
@@ -85,7 +86,7 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
         generated_indices = pd.DatetimeIndex(generated_indices)
         
         #dataframe of the result
-        forecast_df = pd.DataFrame(data = pred.values, index = generated_indices, columns=["target"])
+        forecast_df = pd.DataFrame(data = pred.values, index = generated_indices, columns=[f"{colname}"])
         return forecast_df
 
     else:
@@ -151,7 +152,7 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
         #we can access the generated_indices
         generated_indices = pd.DatetimeIndex(generated_indices)
 
-        forecast_df = pd.DataFrame(data = pred_values, index = generated_indices, columns=["target"])
+        forecast_df = pd.DataFrame(data = pred_values, index = generated_indices, columns=[f"{colname}"])
         return forecast_df
 
 
@@ -161,6 +162,7 @@ def evaluate_model_uni_with_gap(
 ):
     #We will use the  fifth and sixth argument to build the index. 
     df = df_arg.copy(deep = True)
+    colname = df.columns[0]
 
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)
@@ -255,7 +257,7 @@ def evaluate_model_uni_with_gap(
 
     # Create a new DataFrame of the result
     forecast_df = pd.DataFrame(
-        data=predictions.values, index=generated_indices, columns=["target"]
+        data=predictions.values, index=generated_indices, columns=[f"{colname}"]
     )
 
     return metric, forecast_df
