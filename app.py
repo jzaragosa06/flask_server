@@ -265,13 +265,23 @@ def seasonality():
             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
 
         tsType = request.form.get("type")
-        seasonal_result = compute_seasonality(df_arg=df, ts_type=tsType)
+        freq = request.form.get("freq")
+
+        
+        date_column = df.index.name
+        colnames = df.columns.to_list()
+
+        seasonal_dfs, components = compute_seasonality_prophet(
+            df_arg = df, date_column=date_column, value_columns=colnames, freq=freq
+        )
+        
+        
+        
 
         response = prepare_seasonality_response(
-            df_arg=df, tsType=tsType, seasonal_result=seasonal_result
+            df_arg=df, tsType=tsType, colnames=colnames, components = components,  seasonal_dfs= seasonal_dfs
         )
 
-        print(response)
         return Response(json.dumps(response), mimetype="application/json")
 
 

@@ -69,9 +69,9 @@ def compute_seasonality_prophet(df_arg, date_column, value_columns, freq):
         forecast = model.predict(future)
 
         # Plot the decomposition graph (trend, seasonality)
-        # model.plot_components(forecast)
-        # plt.suptitle(f"Seasonality Components for {value_column}")
-        # plt.show()
+        model.plot_components(forecast)
+        plt.suptitle(f"Seasonality Components for {value_column}")
+        plt.show()
 
 
         # Extract the seasonality components that are present
@@ -81,3 +81,27 @@ def compute_seasonality_prophet(df_arg, date_column, value_columns, freq):
     return seasonality_results, components
 
 
+ 
+
+# Example usage
+df = pd.read_csv(r"test/data/candy_production.csv", index_col = 0, parse_dates = True)
+# df = pd.read_csv(r"test/data/thames_water.csv", index_col = 0, parse_dates = [0])
+# df = pd.read_csv(r"test/data/apple2.csv", parse_dates=True, index_col=0)
+df.index = pd.to_datetime(df.index, errors='coerce')  # Convert index to datetime explicitly
+
+date_column = df.index.name
+value_columns = df.columns.to_list()
+
+
+print(df)
+
+# we're passing a dataframe where the dates are set to the index. We need to write the code to 
+# take this into account. 
+seasonal_dfs = compute_seasonality_prophet(
+    df_arg = df, date_column=date_column, value_columns=value_columns, freq='M'
+)
+
+# Print results
+for col, seasonality_df in seasonal_dfs.items():
+    print(f"Seasonality for {col}:")
+    print(seasonality_df)

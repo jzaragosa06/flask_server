@@ -1,35 +1,3 @@
-import pandas as pd
-from prophet import Prophet
-import matplotlib.pyplot as plt
-
-
-# def compute_seasonality_prophet(df_arg, date_column, value_column):
-#     # Prepare the data for Prophet
-#     df = df_arg[[date_column, value_column]].copy()
-#     df.columns = ["ds", "y"]  # Prophet requires 'ds' (date) and 'y' (value) columns
-
-#     # Initialize the Prophet model
-#     model = Prophet()
-
-#     # Fit the model
-#     model.fit(df)
-
-#     # Make future dataframe for predictions (extending time series for future)
-#     future = model.make_future_dataframe(
-#         periods=0
-#     )  # No extra predictions, just fitting the data
-
-#     # Get the forecast and decomposition components
-#     forecast = model.predict(future)
-
-#     # Plot the decomposition graph (trend, seasonality)
-#     model.plot_components(forecast)
-#     plt.show()
-
-#     # Extract the seasonality component
-#     seasonality_df = forecast[["ds", "yearly", "weekly", "trend"]]
-
-#     return seasonality_df
 
 
 import pandas as pd
@@ -71,7 +39,11 @@ def compute_seasonality_prophet(df_arg, date_column, value_column):
     return seasonality_df
 
 
-df = pd.read_csv("test\data\candy_production.csv")
+df = pd.read_csv("test/data/candy_production.csv")
 seasonal_df = compute_seasonality_prophet(
     df, date_column="observation_date", value_column="IPG3113N"
 )
+
+print(df)
+
+print(seasonal_df)

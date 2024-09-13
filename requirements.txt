@@ -1,6 +1,10 @@
+numpy==1.26.0
+pandas
 flask
+scikit-learn
 flask_cors
 skforecast
-sklearn
 statsmodels
 prophet
+google.generativeai
+ipython

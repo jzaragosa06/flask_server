@@ -54,24 +54,51 @@ def prepare_trend_response(
     return response
 
 
-def prepare_seasonality_response(df_arg, tsType, seasonal_result):
+# def prepare_seasonality_response(df_arg, tsType, seasonal_result):
+#     df = df_arg.copy(deep=True)
+
+#     df_dict = fillMissing(df).to_dict(orient="list")
+#     df_dict["index"] = [
+#         date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
+#     ]
+
+#     seasonality_dict = fillMissing(seasonal_result).to_dict(orient="list")
+#     seasonality_dict["index"] = [
+#         date.strftime("%m/%d/%Y")
+#         for date in pd.to_datetime(seasonal_result.index).to_list()
+#     ]
+
+#     response = {
+#         "tstype": tsType,
+#         "seasonality": seasonality_dict,
+#         "entire_data": df_dict,
+#     }
+
+#     return response
+
+def prepare_seasonality_response(df_arg, tsType, colnames, components,  seasonal_dfs):
     df = df_arg.copy(deep=True)
-
-    df_dict = fillMissing(df).to_dict(orient="list")
-    df_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
-    ]
-
-    seasonality_dict = fillMissing(seasonal_result).to_dict(orient="list")
-    seasonality_dict["index"] = [
-        date.strftime("%m/%d/%Y")
-        for date in pd.to_datetime(seasonal_result.index).to_list()
-    ]
+    #the seasonal_dfs is a dictionary of dataframe
+    
+    seasonality_dict = {}
+    
+    
+    for varname, df in seasonal_dfs.items():
+        temp_dict = {}
+        for component in components: 
+            
+            if (component == "ds"):
+                temp_dict[component] = [ date.strftime("%m/%d/%Y") for date in pd.to_datetime(df[component]).to_list()]
+            else:     
+                temp_dict[component] = df[component].to_list()
+        
+        seasonality_dict[varname] = temp_dict
+        
+    print(seasonality_dict)
 
     response = {
         "tstype": tsType,
         "seasonality": seasonality_dict,
-        "entire_data": df_dict,
     }
 
     return response
