@@ -4,8 +4,8 @@ from flask import Flask, request, jsonify
 import io
 
 
-from behavior.extract_behavior import *
-from llm.gemini_pro_text import *
+from app.resources.behavior.extract_behavior import *
+from app.resources.llm.gemini_pro_text import *
 
 
 def fillMissing(df):

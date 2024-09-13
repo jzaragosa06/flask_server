@@ -2,8 +2,9 @@
 In this version:
 -We optimize the parameters to the base models before incorporating them in a stacking regressor model.
 -The time it takes to find the parameter to this model may vary for up to 10 minutes each.
--This is for multi.
+-This is fore uni. 
 """
+
 
 import pandas as pd
 import numpy as np
@@ -21,11 +22,11 @@ from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor, Gradien
 from sklearn.datasets import make_regression
 from sklearn.metrics import mean_squared_error
 
-from utility.create_feature import *
+from app.resources.utility.create_feature import *
 
 
 
-def optimize_base_models_multi(df_arg, dict_lags):
+def optimize_base_models_uni(df_arg, lag_value):
     # for this, we will use the following models as base:
         # LinearRegression
         # SVR
@@ -34,7 +35,7 @@ def optimize_base_models_multi(df_arg, dict_lags):
         # The meta-model is
         # LinearRegression
 
-    lagged_data = create_lag_features_multi(df_arg=df_arg, dict_lags=dict_lags)
+    lagged_data = create_lag_features_uni(df_arg=df_arg, lag_value=lag_value)
     # column name of the last col.
 
     # separate x and y.
@@ -99,11 +100,9 @@ def optimize_base_models_multi(df_arg, dict_lags):
         
         
 
-
-
-def build_stacking_regressor_multi(df_arg, dict_lags):
+def build_stacking_regressor_uni(df_arg, lag_value):
     # # basically, this is a list of tuples, where each tuple contains  2 elements.
-    # base_estimators = optimize_base_models_multi(df_arg = df_arg, dict_lags=dict_lags )
+    # base_estimators = optimize_base_models_uni(df_arg = df_arg, lag_value=lag_value)
 
     # # Initialize stacking regressor with a linear regression meta-estimator
     # stacking_regressor = StackingRegressor(

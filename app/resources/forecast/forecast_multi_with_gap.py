@@ -12,8 +12,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 
 # from models.stacking import *
-from models.stacking_multi import *
-from utility.gap_functions import *
+from app.resources.models.stacking_multi import *
+from app.resources.utility.gap_functions import *
 
 
 # def forecast_multi_with_gap(df_arg, lag_list, steps_value, freq, gap_length, interval_length_before_gap, forecast_method='without_refit'):

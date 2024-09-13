@@ -20,7 +20,7 @@ from sklearn.model_selection import train_test_split
 # this is relative import
 # from seasonality_analysis import *
 # from models.stacking import *
-from models.stacking_uni import *
+from app.resources.models.stacking_uni import *
 
 
 

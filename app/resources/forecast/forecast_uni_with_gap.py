@@ -14,11 +14,11 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
-
-from models.stacking_uni import *
-from utility.gap_functions import *
-
 from sklearn.model_selection import train_test_split
+
+from app.resources.models.stacking_uni import *
+from app.resources.utility.gap_functions import *
+
 
 
 

@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 
 # from models.stacking import *
-from models.stacking_multi import *
+from app.resources.models.stacking_multi import *
 
 
 # def forecast_multi(df_arg, lag_list, steps_value, freq, forecast_method='without_refit'):

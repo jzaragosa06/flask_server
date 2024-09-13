@@ -1,28 +1,40 @@
 import pandas as pd
 import numpy as np
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, Blueprint
 from flask_cors import CORS
 import io
-
-from flask import Response
 import json
 
-from utility.lags import *
-from forecast.forecast_uni import *
-from forecast.forecast_uni_with_gap import *
-from forecast.forecast_multi import *
-from forecast.forecast_multi_with_gap import *
-from utility.gap_functions import *
-from Trend_analysis.sma import *
-from seasonality_analysis.seasonal import *
-from utility.prepare_response import *
 
 
-app = Flask(__name__)
-CORS(app)
+# from .resources.utility.lags import *
+# from .resources.forecast.forecast_uni import *
+# from .resources.forecast.forecast_uni_with_gap import *
+# from .resources.forecast.forecast_multi import *
+# from .resources.forecast.forecast_multi_with_gap import *
+# from .resources.utility.gap_functions import *
+# from .resources.Trend_analysis.sma import *
+# from .resources.seasonality_analysis.seasonal import *
+# from .resources.utility.prepare_response import *
 
 
-@app.route("/forecast-univariate", methods=["POST"])
+from app.resources.utility.lags import *
+from app.resources.forecast.forecast_uni import *
+from app.resources.forecast.forecast_uni_with_gap import *
+from app.resources.forecast.forecast_multi import *
+from app.resources.forecast.forecast_multi_with_gap import *
+from app.resources.utility.gap_functions import *
+from app.resources.Trend_analysis.sma import *
+from app.resources.seasonality_analysis.seasonal import *
+from app.resources.utility.prepare_response import *
+
+
+
+api = Blueprint('api', __name__)
+
+
+
+@api.route("/forecast-univariate", methods=["POST"])
 def forecast_univariate():
     file = request.files["inputFile"]
     if file:
@@ -140,7 +152,7 @@ def forecast_univariate():
             return jsonify({"message": f"Error in preparing response: {e}"}), 500
 
 
-@app.route("/forecast-multivariate", methods=["POST"])
+@api.route("/forecast-multivariate", methods=["POST"])
 def forecast_multivariate():
     file = request.files["inputFile"]
 
@@ -227,7 +239,7 @@ def forecast_multivariate():
             return jsonify({"message": f"Error in preparing response: {e}"}), 500
 
 
-@app.route("/trend", methods=["POST"])
+@api.route("/trend", methods=["POST"])
 def trend():
     file = request.files["inputFile"]
 
@@ -252,7 +264,7 @@ def trend():
         return Response(json.dumps(response), mimetype="application/json")
 
 
-@app.route("/seasonality", methods=["POST"])
+@api.route("/seasonality", methods=["POST"])
 def seasonality():
     file = request.files["inputFile"]
 
@@ -284,6 +296,28 @@ def seasonality():
 
         return Response(json.dumps(response), mimetype="application/json")
 
+@api.route('/hello', methods=['GET'])
+def hello_world():
+    return jsonify(message="Hello, World!"), 200
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
+
+#==============================================================================================================
+# import pandas as pd
+# import numpy as np
+# from flask import Flask, request, jsonify, Response, Blueprint
+# from flask_cors import CORS
+# import io
+# import json
+
+
+
+
+# api = Blueprint('api', __name__)
+
+
+
+
+# @api.route('/hello', methods=['GET'])
+# def hello_world():
+#     return jsonify(message="Hello, World!"), 200
