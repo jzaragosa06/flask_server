@@ -35,10 +35,11 @@ def prepare_trend_response(
             temp_df = pd.DataFrame(df[colname])
             behaviorRaw = detect_changes_in_series(time_series=temp_df)
             explanation_text = explainTrendBehavior(behaviorRaw=behaviorRaw)
-
+ 
             explanation[colname] = explanation_text
 
     trend_dict = fillMissing(trend_result).to_dict(orient="list")
+    
     trend_dict["index"] = [
         date.strftime("%m/%d/%Y")
         for date in pd.to_datetime(trend_result.index).to_list()
@@ -53,28 +54,6 @@ def prepare_trend_response(
 
     return response
 
-
-# def prepare_seasonality_response(df_arg, tsType, seasonal_result):
-#     df = df_arg.copy(deep=True)
-
-#     df_dict = fillMissing(df).to_dict(orient="list")
-#     df_dict["index"] = [
-#         date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
-#     ]
-
-#     seasonality_dict = fillMissing(seasonal_result).to_dict(orient="list")
-#     seasonality_dict["index"] = [
-#         date.strftime("%m/%d/%Y")
-#         for date in pd.to_datetime(seasonal_result.index).to_list()
-#     ]
-
-#     response = {
-#         "tstype": tsType,
-#         "seasonality": seasonality_dict,
-#         "entire_data": df_dict,
-#     }
-
-#     return response
 
 def prepare_seasonality_response(df_arg, tsType, colnames, components,  seasonal_dfs):
     df = df_arg.copy(deep=True)

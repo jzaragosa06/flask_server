@@ -18,4 +18,5 @@ def compute_sma(df_arg, ts_type="univariate", window_sizes=[5, 10, 20]):
                 colname = df.columns[i]
                 sma_df[f"{colname}_sma_{window_size}"] = sma
 
+    print(sma)
     return sma_df
