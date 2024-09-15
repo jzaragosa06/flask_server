@@ -283,15 +283,13 @@ def seasonality():
         date_column = df.index.name
         colnames = df.columns.to_list()
 
-        seasonal_dfs, components = compute_seasonality_prophet(
+        seasonal_dfs, components, seasonality_per_period = compute_seasonality_prophet(
             df_arg = df, date_column=date_column, value_columns=colnames, freq=freq
         )
         
-        
-        
 
         response = prepare_seasonality_response(
-            df_arg=df, tsType=tsType, colnames=colnames, components = components,  seasonal_dfs= seasonal_dfs
+            df_arg=df, tsType=tsType, colnames=colnames, components = components,  seasonal_dfs= seasonal_dfs, seasonality_per_period=seasonality_per_period
         )
 
         return Response(json.dumps(response), mimetype="application/json")

@@ -8,3 +8,4 @@ statsmodels
 prophet
 google.generativeai
 ipython
+tabulate
