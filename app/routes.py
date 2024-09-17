@@ -6,7 +6,6 @@ import io
 import json
 
 
-
 # from .resources.utility.lags import *
 # from .resources.forecast.forecast_uni import *
 # from .resources.forecast.forecast_uni_with_gap import *
@@ -29,9 +28,7 @@ from app.resources.seasonality_analysis.seasonal import *
 from app.resources.utility.prepare_response import *
 
 
-
-api = Blueprint('api', __name__)
-
+api = Blueprint("api", __name__)
 
 
 @api.route("/forecast-univariate", methods=["POST"])
@@ -279,28 +276,30 @@ def seasonality():
         tsType = request.form.get("type")
         freq = request.form.get("freq")
 
-        
         date_column = df.index.name
         colnames = df.columns.to_list()
 
-        seasonal_dfs, components, seasonality_per_period = compute_seasonality_prophet(
-            df_arg = df, date_column=date_column, value_columns=colnames, freq=freq
+        components, seasonality_per_period = compute_seasonality_prophet(
+            df_arg=df, date_column=date_column, value_columns=colnames, freq=freq
         )
-        
 
         response = prepare_seasonality_response(
-            df_arg=df, tsType=tsType, colnames=colnames, components = components,  seasonal_dfs= seasonal_dfs, seasonality_per_period=seasonality_per_period
+            df_arg=df,
+            tsType=tsType,
+            colnames=colnames,
+            components=components,
+            seasonality_per_period=seasonality_per_period,
         )
 
         return Response(json.dumps(response), mimetype="application/json")
 
-@api.route('/hello', methods=['GET'])
+
+@api.route("/hello", methods=["GET"])
 def hello_world():
     return jsonify(message="Hello, World!"), 200
 
 
-
-#==============================================================================================================
+# ==============================================================================================================
 # import pandas as pd
 # import numpy as np
 # from flask import Flask, request, jsonify, Response, Blueprint
@@ -309,11 +308,7 @@ def hello_world():
 # import json
 
 
-
-
 # api = Blueprint('api', __name__)
-
-
 
 
 # @api.route('/hello', methods=['GET'])
