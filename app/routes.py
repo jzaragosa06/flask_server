@@ -6,24 +6,13 @@ import io
 import json
 
 
-# from .resources.utility.lags import *
-# from .resources.forecast.forecast_uni import *
-# from .resources.forecast.forecast_uni_with_gap import *
-# from .resources.forecast.forecast_multi import *
-# from .resources.forecast.forecast_multi_with_gap import *
-# from .resources.utility.gap_functions import *
-# from .resources.Trend_analysis.sma import *
-# from .resources.seasonality_analysis.seasonal import *
-# from .resources.utility.prepare_response import *
-
-
 from app.resources.utility.lags import *
 from app.resources.forecast.forecast_uni import *
 from app.resources.forecast.forecast_uni_with_gap import *
 from app.resources.forecast.forecast_multi import *
 from app.resources.forecast.forecast_multi_with_gap import *
 from app.resources.utility.gap_functions import *
-from app.resources.Trend_analysis.sma import *
+from app.resources.trend_analysis.sma import *
 from app.resources.seasonality_analysis.seasonal import *
 from app.resources.utility.prepare_response import *
 
