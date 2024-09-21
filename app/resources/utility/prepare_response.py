@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from flask import Flask, request, jsonify
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 import io
 
 
@@ -159,6 +160,12 @@ def prepare_forecast_response(
     else:
         colnames = df.columns.tolist()
 
+    # Calculate evaluation metrics between test data and predictions
+    mae = mean_absolute_error(test_data, pred_test)
+    mse = mean_squared_error(test_data, pred_test)
+    rmse = np.sqrt(mse)
+    mape = np.mean(np.abs((test_data - pred_test) / test_data)) * 100
+
     response = {
         "metadata": {
             "tstype": tsType,
@@ -172,7 +179,13 @@ def prepare_forecast_response(
             "pred_out": pred_out_dict,
             "pred_test": pred_test_dict,
             "pred_out_explanation": explanation,
-            "metric": metric_value,
+            "metric": {
+                "mae": mae,
+                "mse": mse,
+                "rmse": rmse,
+                "mape": mape,
+            },
+            "metric_test_from_backtesting": metric_value,
         },
         "data": {
             "train_data": train_data_dict,
