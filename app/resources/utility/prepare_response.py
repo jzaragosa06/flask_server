@@ -179,7 +179,7 @@ def prepare_forecast_response(
             "pred_out": pred_out_dict,
             "pred_test": pred_test_dict,
             "pred_out_explanation": explanation,
-            "metric": {
+            "metrics": {
                 "mae": mae,
                 "mse": mse,
                 "rmse": rmse,
