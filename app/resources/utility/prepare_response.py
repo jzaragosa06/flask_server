@@ -161,10 +161,16 @@ def prepare_forecast_response(
         colnames = df.columns.tolist()
 
     # Calculate evaluation metrics between test data and predictions
-    mae = mean_absolute_error(test_data, pred_test)
-    mse = mean_squared_error(test_data, pred_test)
-    rmse = np.sqrt(mse)
-    mape = np.mean(np.abs((test_data - pred_test) / test_data)) * 100
+    if tsType == "univariate":
+        mae = mean_absolute_error(test_data, pred_test)
+        mse = mean_squared_error(test_data, pred_test)
+        rmse = np.sqrt(mse)
+        mape = np.mean(np.abs((test_data - pred_test) / test_data)) * 100
+    else:
+        mae = mean_absolute_error(test_data.iloc[:, -1], pred_test)
+        mse = mean_squared_error(test_data.iloc[:, -1], pred_test)
+        rmse = np.sqrt(mse)
+        mape = np.mean(np.abs((test_data.iloc[:, -1] - pred_test) / test_data)) * 100
 
     response = {
         "metadata": {
@@ -193,5 +199,7 @@ def prepare_forecast_response(
             "entire_data": df_dict,
         },
     }
+
+    print(response)
 
     return response
