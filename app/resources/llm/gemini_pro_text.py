@@ -8,9 +8,9 @@ import google.generativeai as genai
 # from IPython.display import Markdown
 
 
-def to_markdown(text):
-    text = text.replace(":", " *")
-    return Markdown(textwrap.indent(text, "> ", predicate=lambda _: True))
+# def to_markdown(text):
+#     text = text.replace(":", " *")
+#     return Markdown(textwrap.indent(text, "> ", predicate=lambda _: True))
 
 model = genai.GenerativeModel("gemini-pro")
 
@@ -48,9 +48,18 @@ def explainSeasonalityBehavior(behaviorRaw):
     return response.text
 
 
-def answerMessage(question, about, text_result):
+# def answerMessage(question, about, text_result):
+#     # we can extract the 'about' i.e., trend, seasonality, forecast from the screen.
+#     query = f"this is a question about {about}. This is the behaviour of data: {text_result}. Answer this question: {question}."
+#     response = model.generate_content(query)
+
+#     return response.text
+
+
+def answerMessage(message, about, text_result="None"):
     # we can extract the 'about' i.e., trend, seasonality, forecast from the screen.
-    query = f"this is a question about {about}. This is the behaviour of data: {text_result}. Answer this question: {question}."
+    query = f"this is a question about {about}. This is the behaviour of data: {text_result}. Answer this question: {message}."
+    print(query)
     response = model.generate_content(query)
 
     return response.text

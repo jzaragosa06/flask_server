@@ -15,6 +15,7 @@ from app.resources.utility.gap_functions import *
 from app.resources.trend_analysis.sma import *
 from app.resources.seasonality_analysis.seasonal import *
 from app.resources.utility.prepare_response import *
+from app.resources.llm.gemini_pro_text import *
 
 
 api = Blueprint("api", __name__)
@@ -288,18 +289,20 @@ def hello_world():
     return jsonify(message="Hello, World!"), 200
 
 
-# ==============================================================================================================
-# import pandas as pd
-# import numpy as np
-# from flask import Flask, request, jsonify, Response, Blueprint
-# from flask_cors import CORS
-# import io
-# import json
+@api.route("/llm", methods=["POST"])
+def llm():
+    data = request.json  # This will correctly get the JSON payload
+    message = data.get("message")
+    about = data.get("about")
+    # message = request.form.get("message")
+    # about = request.form.get("about")
 
+    print(message)
+    print(f"about {about}")
 
-# api = Blueprint('api', __name__)
+    # this returns a raw text
+    response = answerMessage(message=message, about=about)
 
+    print(response)
 
-# @api.route('/hello', methods=['GET'])
-# def hello_world():
-#     return jsonify(message="Hello, World!"), 200
+    return jsonify({"response": response})
