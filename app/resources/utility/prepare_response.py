@@ -56,25 +56,59 @@ def prepare_trend_response(
     return response
 
 
+# def prepare_seasonality_response(
+#     df_arg, tsType, colnames, components, seasonality_per_period
+# ):
+#     df = df_arg.copy(deep=True)
+#     # the seasonal_dfs is a dictionary of dataframe
+
+#     seasonality_per_period_dict = {}
+
+#     # Process seasonality per period (seasonality_per_period)
+#     for varname, period_dict in seasonality_per_period.items():
+#         for period, period_df in period_dict.items():
+#             temp_dict_new = {}
+#             temp_dict_new[period] = {
+#                 "values": period_df[period].to_list(),
+#                 "lower": period_df[f"{period}_lower"].to_list(),
+#                 "upper": period_df[f"{period}_upper"].to_list(),
+#             }
+
+#         # add to the seasonality_per_period_dict
+#         seasonality_per_period_dict[varname] = temp_dict_new
+
+#     if tsType == "univariate":
+#         colnames = df.columns[0]
+#     else:
+#         colnames = df.columns.tolist()
+
+#     response = {
+#         "tstype": tsType,
+#         "components": components,
+#         "seasonality_per_period": seasonality_per_period_dict,
+#         "colnames": colnames,
+#     }
+
+#     return response
+
+
 def prepare_seasonality_response(
     df_arg, tsType, colnames, components, seasonality_per_period
 ):
     df = df_arg.copy(deep=True)
-    # the seasonal_dfs is a dictionary of dataframe
 
     seasonality_per_period_dict = {}
 
     # Process seasonality per period (seasonality_per_period)
     for varname, period_dict in seasonality_per_period.items():
+        # print(f"{varname} ----- {period_dict}")
+        temp_dict_new = {}
         for period, period_df in period_dict.items():
-            temp_dict_new = {}
             temp_dict_new[period] = {
                 "values": period_df[period].to_list(),
                 "lower": period_df[f"{period}_lower"].to_list(),
                 "upper": period_df[f"{period}_upper"].to_list(),
             }
-
-        # add to the seasonality_per_period_dict
         seasonality_per_period_dict[varname] = temp_dict_new
 
     if tsType == "univariate":
