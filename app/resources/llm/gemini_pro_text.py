@@ -63,3 +63,9 @@ def answerMessage(message, about, text_result="None"):
     response = model.generate_content(query)
 
     return response.text
+
+
+def describeForecastModelOnTest(mape, about):
+    query = f"This is about {about}. In testing the model on testing data, i get a MAPE of {mape}. Describe how the model do. Explain it simply in one paragraph"
+    response = model.generate_content(query)
+    return response.text
