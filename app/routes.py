@@ -16,7 +16,7 @@ from app.resources.trend_analysis.sma import *
 from app.resources.seasonality_analysis.seasonal import *
 from app.resources.utility.prepare_response import *
 from app.resources.llm.gemini_pro_text import *
-
+from app.resources.trend_prophet.trend import *
 
 api = Blueprint("api", __name__)
 
@@ -226,6 +226,31 @@ def forecast_multivariate():
             return jsonify({"message": f"Error in preparing response: {e}"}), 500
 
 
+# @api.route("/trend", methods=["POST"])
+# def trend():
+#     file = request.files["inputFile"]
+
+#     if file:
+#         try:
+#             df = pd.read_csv(file, index_col=0, parse_dates=True)
+#             print(df.head())
+#         except Exception as e:
+#             print(f"Error loading DataFrame: {e}")
+#             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
+
+#         tsType = request.form.get("type")
+
+#         # extract trend and seasonality behaviour of the ts data.
+#         trend_result = compute_sma(df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
+
+#         response = prepare_trend_response(
+#             df_arg=df, tsType=tsType, trend_result=trend_result
+#         )
+
+#         print(response)
+#         return Response(json.dumps(response), mimetype="application/json")
+
+
 @api.route("/trend", methods=["POST"])
 def trend():
     file = request.files["inputFile"]
@@ -240,8 +265,17 @@ def trend():
 
         tsType = request.form.get("type")
 
+        tsType = request.form.get("type")
+        freq = request.form.get("freq")
+
+        date_column = df.index.name
+        colnames = df.columns.to_list()
+
         # extract trend and seasonality behaviour of the ts data.
-        trend_result = compute_sma(df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
+        # trend_result = (df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
+        trend_result = compute_trend_prophet(
+            df_arg=df, date_column=date_column, value_columns=colnames, freq=freq
+        )
 
         response = prepare_trend_response(
             df_arg=df, tsType=tsType, trend_result=trend_result

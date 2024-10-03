@@ -13,6 +13,49 @@ def fillMissing(df):
     return df.fillna("")
 
 
+# def prepare_trend_response(
+#     df_arg,
+#     tsType,
+#     trend_result,
+# ):
+#     df = df_arg.copy(deep=True)
+
+#     if tsType == "univariate":
+#         colnames = df.columns[0]
+
+#         # here, we will extract the forecast explanation
+#         behaviorRaw = detect_changes_in_series(time_series=df)
+#         explanation = explainTrendBehavior(behaviorRaw=behaviorRaw)
+
+#     else:
+#         colnames = df.columns.tolist()
+
+#         explanation = {}
+
+#         for colname in colnames:
+#             temp_df = pd.DataFrame(df[colname])
+#             behaviorRaw = detect_changes_in_series(time_series=temp_df)
+#             explanation_text = explainTrendBehavior(behaviorRaw=behaviorRaw)
+
+#             explanation[colname] = explanation_text
+
+#     trend_dict = fillMissing(trend_result).to_dict(orient="list")
+
+#     trend_dict["index"] = [
+#         date.strftime("%m/%d/%Y")
+#         for date in pd.to_datetime(trend_result.index).to_list()
+#     ]
+
+#     response = {
+#         "tstype": tsType,
+#         "trend": trend_dict,
+#         "explanations": explanation,
+#         "colname": colnames,
+#     }
+
+#     return response
+
+
 def prepare_trend_response(
     df_arg,
     tsType,
@@ -23,73 +66,39 @@ def prepare_trend_response(
     if tsType == "univariate":
         colnames = df.columns[0]
 
-        # here, we will extract the forecast explanation
-        behaviorRaw = detect_changes_in_series(time_series=df)
-        explanation = explainTrendBehavior(behaviorRaw=behaviorRaw)
-
     else:
         colnames = df.columns.tolist()
 
-        explanation = {}
+    trend_dict = {}
+    counter = True
+    for varname, trend_df in trend_result.items():
+        if counter is True:
+            # add the ds and dy
+            # trend_dict["index"] = trend_df["ds"].to_list()
+            # trend_dict["index"] = [date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()]
+            trend_dict["index"] = [
+                date.strftime("%m/%d/%Y")
+                for date in pd.to_datetime(trend_df["ds"]).to_list()
+            ]
 
-        for colname in colnames:
-            temp_df = pd.DataFrame(df[colname])
-            behaviorRaw = detect_changes_in_series(time_series=temp_df)
-            explanation_text = explainTrendBehavior(behaviorRaw=behaviorRaw)
+            trend_dict[varname] = trend_df["trend"].to_list()
+        else:
+            trend_dict[varname] = trend_df["trend"].to_list()
 
-            explanation[colname] = explanation_text
+    # trend_dict = fillMissing(trend_result).to_dict(orient="list")
 
-    trend_dict = fillMissing(trend_result).to_dict(orient="list")
-
-    trend_dict["index"] = [
-        date.strftime("%m/%d/%Y")
-        for date in pd.to_datetime(trend_result.index).to_list()
-    ]
+    # trend_dict["index"] = [
+    #     date.strftime("%m/%d/%Y")
+    #     for date in pd.to_datetime(trend_result.index).to_list()
+    # ]
 
     response = {
         "tstype": tsType,
         "trend": trend_dict,
-        "explanations": explanation,
         "colname": colnames,
     }
 
     return response
-
-
-# def prepare_seasonality_response(
-#     df_arg, tsType, colnames, components, seasonality_per_period
-# ):
-#     df = df_arg.copy(deep=True)
-#     # the seasonal_dfs is a dictionary of dataframe
-
-#     seasonality_per_period_dict = {}
-
-#     # Process seasonality per period (seasonality_per_period)
-#     for varname, period_dict in seasonality_per_period.items():
-#         for period, period_df in period_dict.items():
-#             temp_dict_new = {}
-#             temp_dict_new[period] = {
-#                 "values": period_df[period].to_list(),
-#                 "lower": period_df[f"{period}_lower"].to_list(),
-#                 "upper": period_df[f"{period}_upper"].to_list(),
-#             }
-
-#         # add to the seasonality_per_period_dict
-#         seasonality_per_period_dict[varname] = temp_dict_new
-
-#     if tsType == "univariate":
-#         colnames = df.columns[0]
-#     else:
-#         colnames = df.columns.tolist()
-
-#     response = {
-#         "tstype": tsType,
-#         "components": components,
-#         "seasonality_per_period": seasonality_per_period_dict,
-#         "colnames": colnames,
-#     }
-
-#     return response
 
 
 def prepare_seasonality_response(
