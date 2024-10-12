@@ -2,6 +2,7 @@ import pathlib
 import textwrap
 
 import google.generativeai as genai
+import markdown2
 
 
 # from IPython.display import display
@@ -56,13 +57,21 @@ def explainSeasonalityBehavior(behaviorRaw):
 #     return response.text
 
 
+# def answerMessage(message, about, text_result="None"):
+#     # we can extract the 'about' i.e., trend, seasonality, forecast from the screen.
+#     query = f"this is a question about {about}. This is the behaviour of data: {text_result}. Answer this question: {message}."
+#     print(query)
+#     response = model.generate_content(query)
+
+
+#     return response.text
 def answerMessage(message, about, text_result="None"):
     # we can extract the 'about' i.e., trend, seasonality, forecast from the screen.
-    query = f"this is a question about {about}. This is the behaviour of data: {text_result}. Answer this question: {message}."
-    print(query)
+    query = f"Answer this question: {message}."
     response = model.generate_content(query)
+    text = markdown2.markdown(response.text)
 
-    return response.text
+    return text
 
 
 def describeForecastModelOnTest(mape, about):

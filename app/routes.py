@@ -87,7 +87,7 @@ def forecast_univariate():
                     forecast_method="without_refit",
                 )
         try:
-            response = prepare_forecast_response(
+            response = prepare_forecast_response_univariate(
                 df_arg=df,
                 tsType=tsType,
                 freq=freq,
@@ -169,7 +169,7 @@ def forecast_multivariate():
                     forecast_method="without_refit",
                 )
         try:
-            response = prepare_forecast_response(
+            response = prepare_forecast_response_multivariate(
                 df_arg=df,
                 tsType=tsType,
                 freq=freq,
@@ -202,9 +202,8 @@ def trend():
             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
 
         tsType = request.form.get("type")
-
-        tsType = request.form.get("type")
         freq = request.form.get("freq")
+        description = request.form.get("description")
 
         date_column = df.index.name
         colnames = df.columns.to_list()
@@ -215,9 +214,22 @@ def trend():
             df_arg=df, date_column=date_column, value_columns=colnames, freq=freq
         )
 
-        response = prepare_trend_response(
-            df_arg=df, tsType=tsType, trend_result=trend_result
-        )
+        if tsType == "univariate":
+            response = prepare_trend_response_univariate(
+                df_arg=df,
+                tsType=tsType,
+                trend_result=trend_result,
+                freq=freq,
+                description=description,
+            )
+        else:
+            response = prepare_trend_response_multivariate(
+                df_arg=df,
+                tsType=tsType,
+                trend_result=trend_result,
+                freq=freq,
+                description=description,
+            )
 
         print(response)
         return Response(json.dumps(response), mimetype="application/json")
@@ -237,6 +249,7 @@ def seasonality():
 
         tsType = request.form.get("type")
         freq = request.form.get("freq")
+        description = request.form.get("description")
 
         date_column = df.index.name
         colnames = df.columns.to_list()
@@ -245,13 +258,28 @@ def seasonality():
             df_arg=df, date_column=date_column, value_columns=colnames, freq=freq
         )
 
-        response = prepare_seasonality_response(
-            df_arg=df,
-            tsType=tsType,
-            colnames=colnames,
-            components=components,
-            seasonality_per_period=seasonality_per_period,
-        )
+
+        if tsType == "univariate":
+            response = prepare_seasonality_response_univariate(
+                df_arg=df,
+                tsType=tsType,
+                colnames=colnames,
+                components=components,
+                seasonality_per_period=seasonality_per_period,
+                freq=freq,
+                description=description,
+            )
+        else:
+            response = prepare_seasonality_response_multivariate(
+                df_arg=df,
+                tsType=tsType,
+                colnames=colnames,
+                components=components,
+                seasonality_per_period=seasonality_per_period,
+                freq=freq,
+                description=description,
+            )
+
 
         return Response(json.dumps(response), mimetype="application/json")
 
