@@ -15,11 +15,10 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge
 
 from app.resources.models.stacking_uni import *
 from app.resources.utility.gap_functions import *
-
-
 
 
 def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, interval_length_before_gap, forecast_method="without_refit"):
@@ -29,7 +28,7 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
     df_arg=df_arg, lag_value=lag_value)
 
     if forecast_method == "without_refit":
-        #reset the index of the df to integer. 
+        # reset the index of the df to integer.
         df = df.reset_index()
         df = df.drop(df.columns[0], axis = 1)
 
@@ -43,13 +42,13 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
         # Predict
         pred = forecaster.predict(steps=steps_value)
 
-        #=========================================================================    
+        # =========================================================================
         count_before = compute_count_before(df_arg, freq, interval_length_before_gap)
-        
+
         print(f"count_before: {count_before}")
-        
+
         # Generate index for the predicted values
-        #extract the index from the df_arg, since we revert the index to integer. 
+        # extract the index from the df_arg, since we revert the index to integer.
         last_index = df_arg.index[-1]
         generated_indices = []
         current_index = last_index
@@ -81,42 +80,42 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
                     current_index += pd.DateOffset(years=1)
             interval_counter += 1
             generated_indices.append(current_index)
-        #=========================================================================
-        #we can access the generated_indices
+        # =========================================================================
+        # we can access the generated_indices
         generated_indices = pd.DatetimeIndex(generated_indices)
-        
-        #dataframe of the result
+
+        # dataframe of the result
         forecast_df = pd.DataFrame(data = pred.values, index = generated_indices, columns=[f"{colname}"])
         return forecast_df
 
     else:
-        #reset the index of the df to integer. 
+        # reset the index of the df to integer.
         df = df.reset_index()
         df = df.drop(df.columns[0], axis = 1)
 
         forecaster = ForecasterAutoreg(
             regressor=stacking_regressor, lags=lag_value, transformer_y=StandardScaler()
         )             
-        
+
         pred_values = []
-        
+
         for i in range(steps_value):
             forecaster.fit(df.iloc[:,-1])
-            
+
             pred_i = pd.DataFrame(forecaster.predict(steps = 1))
             pred_i_value = pred_i.iloc[0,0]
             pred_values.append(pred_i_value)
 
-            #add the value to the df
+            # add the value to the df
             df.loc[len(df)] = pred_i_value
 
-        #=========================================================================    
+        # =========================================================================
         count_before = compute_count_before(df_arg, freq, interval_length_before_gap)
-        
+
         print(f"count_before: {count_before}")
-        
+
         # Generate index for the predicted values
-        #extract the index from the df_arg, since we revert the index to integer. 
+        # extract the index from the df_arg, since we revert the index to integer.
         last_index = df_arg.index[-1]
         generated_indices = []
         current_index = last_index
@@ -148,13 +147,12 @@ def forecast_uni_with_gap(df_arg, lag_value, steps_value, freq, gap_length, inte
                     current_index += pd.DateOffset(years=1)
             interval_counter += 1
             generated_indices.append(current_index)
-        #=========================================================================
-        #we can access the generated_indices
+        # =========================================================================
+        # we can access the generated_indices
         generated_indices = pd.DatetimeIndex(generated_indices)
 
         forecast_df = pd.DataFrame(data = pred_values, index = generated_indices, columns=[f"{colname}"])
         return forecast_df
-
 
 
 def evaluate_model_uni_with_gap(
@@ -261,8 +259,3 @@ def evaluate_model_uni_with_gap(
     )
 
     return metric, forecast_df
-
-
-
-    
-

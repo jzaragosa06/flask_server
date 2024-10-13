@@ -98,7 +98,7 @@ def forecast_univariate():
                 pred_test=pred_test,
                 pred_out=pred_out,
             )
-            print(response)
+
             return Response(json.dumps(response), mimetype="application/json")
         except Exception as e:
             print(f"Error in preparing response: {e}")
@@ -123,7 +123,7 @@ def forecast_multivariate():
         steps = request.form.get("steps")
         forecastMethod = request.form.get("method")
 
-        dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
+        # dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
 
         hasGap = checkGap(df=df, freq=freq)
         print("has gap? " + str(hasGap))
@@ -132,7 +132,7 @@ def forecast_multivariate():
             if forecastMethod == "without_refit":
                 metric, pred_test = evaluate_model_multi(
                     df_arg=df,
-                    dict_lags=dict_lags,
+                    # dict_lags=dict_lags,
                     steps_value=int(steps),
                     freq=freq,
                     forecast_method="without_refit",
@@ -140,7 +140,7 @@ def forecast_multivariate():
 
                 pred_out = forecast_multi(
                     df_arg=df,
-                    dict_lags=dict_lags,
+                    # dict_lags=dict_lags,
                     steps_value=int(steps),
                     freq=freq,
                     forecast_method="without_refit",
@@ -151,7 +151,7 @@ def forecast_multivariate():
 
                 metric, pred_test = evaluate_model_multi_with_gap(
                     df_arg=df,
-                    dict_lags=dict_lags,
+                    # dict_lags=dict_lags,
                     steps_value=int(steps),
                     freq=freq,
                     gap_length=gap_length,
@@ -161,7 +161,7 @@ def forecast_multivariate():
 
                 pred_out = forecast_multi_with_gap(
                     df_arg=df,
-                    dict_lags=dict_lags,
+                    # dict_lags=dict_lags,
                     steps_value=int(steps),
                     freq=freq,
                     gap_length=gap_length,
@@ -258,7 +258,6 @@ def seasonality():
             df_arg=df, date_column=date_column, value_columns=colnames, freq=freq
         )
 
-
         if tsType == "univariate":
             response = prepare_seasonality_response_univariate(
                 df_arg=df,
@@ -279,7 +278,6 @@ def seasonality():
                 freq=freq,
                 description=description,
             )
-
 
         return Response(json.dumps(response), mimetype="application/json")
 

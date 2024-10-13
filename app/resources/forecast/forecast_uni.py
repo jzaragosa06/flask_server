@@ -15,6 +15,7 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge
 
 
 # this is relative import
@@ -23,21 +24,20 @@ from sklearn.model_selection import train_test_split
 from app.resources.models.stacking_uni import *
 
 
-
-
 def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
-    df = df_arg.copy(deep = True)
-    
-    colname = df.columns[0]
+    df = df_arg.copy(deep=True)
 
+    colname = df.columns[0]
 
     # we'll just use the corresponding row number as index.
     df = df.reset_index()
     df = df.drop(df.columns[0], axis=1)
 
     # Get the model
-    stacking_regressor = build_stacking_regressor_uni(
-        df_arg=df_arg, lag_value=lag_value)
+    # stacking_regressor = build_stacking_regressor_uni(
+    #     df_arg=df_arg, lag_value=lag_value
+    # )
+    stacking_regressor = Ridge(alpha=0.1)
 
     if forecast_method == "without_refit":
         forecaster = ForecasterAutoreg(
@@ -103,7 +103,7 @@ def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_
 def evaluate_model_uni(
     df_arg, lag_value, steps_value, freq, forecast_method="without_refit"
 ):
-    df = df_arg.copy(deep = True)
+    df = df_arg.copy(deep=True)
     colname = df.columns[0]
 
     # Ensure the DatetimeIndex has a frequency
@@ -117,8 +117,10 @@ def evaluate_model_uni(
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
     # Get the model
-    stacking_regressor = build_stacking_regressor_uni(
-        df_arg=df_arg, lag_value=lag_value)
+    # stacking_regressor = build_stacking_regressor_uni(
+    #     df_arg=df_arg, lag_value=lag_value
+    # )
+    stacking_regressor = Ridge(alpha=0.1)
 
     forecaster = ForecasterAutoreg(
         regressor=stacking_regressor, lags=lag_value, transformer_y=StandardScaler()
@@ -133,7 +135,7 @@ def evaluate_model_uni(
             steps=steps_value,
             refit=False,
             fixed_train_size=True,
-            metric="mean_squared_error",
+            metric="mean_absolute_percentage_error",
             n_jobs="auto",
             verbose=False,
         )
@@ -146,7 +148,7 @@ def evaluate_model_uni(
             steps=steps_value,
             refit=True,
             fixed_train_size=False,
-            metric="mean_squared_error",
+            metric="mean_absolute_percentage_error",
             n_jobs="auto",
             verbose=False,
         )
@@ -160,9 +162,9 @@ def evaluate_model_uni(
 
     # the class predicts on the test data. so, the periods must be the lenght of the test data.
     len_test_data = len(test_data)
-    new_indices = pd.date_range(
-        start=last_index, periods=len_test_data + 1, freq=freq
-    )[1:]
+    new_indices = pd.date_range(start=last_index, periods=len_test_data + 1, freq=freq)[
+        1:
+    ]
     # new_indices = pd.to_datetime(new_indices)
     print(new_indices)
 

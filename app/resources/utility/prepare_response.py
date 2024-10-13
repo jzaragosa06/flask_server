@@ -6,6 +6,7 @@ import io
 
 from app.resources.behavior.extract_behavior import *
 from app.resources.llm.gemini_pro_text import *
+from sklearn.metrics._regression import mean_absolute_percentage_error
 
 
 def fillMissing(df):
@@ -87,10 +88,10 @@ def prepare_trend_response_multivariate(
         },
         "trend": trend_dict,
         "explanations": explanations,
-        
     }
 
     return response
+
 
 def prepare_seasonality_response_univariate(
     df_arg, tsType, colnames, components, seasonality_per_period, freq, description
@@ -106,7 +107,7 @@ def prepare_seasonality_response_univariate(
                 "values": period_df[period].to_list(),
             }
         seasonality_per_period_dict[varname] = temp_dict_new
-        
+
     explanations = {}
     for component in components:
         explanations[component] = "lorem ipsum dolor"
@@ -122,10 +123,10 @@ def prepare_seasonality_response_univariate(
         "components": components,
         "seasonality_per_period": seasonality_per_period_dict,
         "explanations": explanations,
-        
     }
 
     return response
+
 
 def prepare_seasonality_response_multivariate(
     df_arg, tsType, colnames, components, seasonality_per_period, freq, description
@@ -142,15 +143,14 @@ def prepare_seasonality_response_multivariate(
                 "values": period_df[period].to_list(),
             }
         seasonality_per_period_dict[varname] = temp_dict_new
-        
+
     explanations = {}
-    for component in components: 
+    for component in components:
         temp_dict = {}
-        for col in cols: 
+        for col in cols:
             temp_dict[col] = f"lorem ipusum {col}"
         explanations[component] = temp_dict
-        
-        
+
     response = {
         "metadata": {
             "tstype": "multivariate",
@@ -164,11 +164,6 @@ def prepare_seasonality_response_multivariate(
         "explanations": explanations,
     }
     return response
-
-
-
-
-
 
 
 def prepare_forecast_response_univariate(
@@ -217,11 +212,35 @@ def prepare_forecast_response_univariate(
     # The above code snippet is written in Python and performs the following tasks:
     # here, we will extract the forecast explanation
     # here we will just use the temporary mape to generate a an explanation about the test on the model.
-    behaviorRaw = detect_changes_in_series(time_series=pred_out)
-    pred_out_explanation = explainForecastBehavior(behaviorRaw=behaviorRaw)
+    # behaviorRaw = detect_changes_in_series(time_series=pred_out)
+    # pred_out_explanation = explainForecastBehavior(behaviorRaw=behaviorRaw)
     # pred_test_explanation = describeForecastModelOnTest(mape, about="forecast")
-    # ==========================================================
+    explanation_out_dict = describeOutForecast_univariate(
+        forecast=pred_out, col=df.columns[0], description=description
+    )
 
+    # we're using the metric from backtesting.
+    error = test_data.iloc[:, 0] - pred_test.iloc[:, 0]
+    explanation_test_dict = describeTestForecast(
+        forecast=pred_test,
+        cols=df.columns,
+        metrics=metric,
+        error=error,
+        description=description,
+    )
+    # ==========================================================
+    print(
+        f"metrics -------------------------------------mape isffrom backtesting {metric}"
+    )
+
+    # =========================================================
+    # Calculate evaluation metrics between test data and predictions
+    mae = mean_absolute_error(test_data, pred_test)
+    mse = mean_squared_error(test_data, pred_test)
+    rmse = np.sqrt(mse)
+    mape = mean_absolute_percentage_error(test_data, pred_test)
+
+    # ==========================================================
     response = {
         "metadata": {
             "tstype": tsType,
@@ -234,16 +253,16 @@ def prepare_forecast_response_univariate(
         "forecast": {
             "pred_out": pred_out_dict,
             "pred_test": pred_test_dict,
-            "pred_out_explanation": pred_out_explanation,
-            "explanation2": "lorem ipsum dolor ...",
-            "explanation3": "lorem ipsum dolor ...",
-            "explanation4": "lorem ipsum dolor ...",
-            "pred_test_explanation": "lorem ipsum dolor ...",
+            "pred_out_explanation": explanation_out_dict,
+            # "explanation2": "lorem ipsum dolor ...",
+            # "explanation3": "lorem ipsum dolor ...",
+            # "explanation4": "lorem ipsum dolor ...",
+            "pred_test_explanation": explanation_test_dict,
             "metrics": {
-                "mae": 0,
-                "mse": 0,
-                "rmse": 0,
-                "mape": 0,
+                "mae": mae,
+                "mse": mse,
+                "rmse": rmse,
+                "mape": mape,
             },
         },
         "data": {
@@ -303,10 +322,30 @@ def prepare_forecast_response_multivariate(
     # The above code snippet is written in Python and performs the following tasks:
     # here, we will extract the forecast explanation
     # here we will just use the temporary mape to generate a an explanation about the test on the model.
-    behaviorRaw = detect_changes_in_series(time_series=pred_out)
-    pred_out_explanation = explainForecastBehavior(behaviorRaw=behaviorRaw)
+    # behaviorRaw = detect_changes_in_series(time_series=pred_out)
+    # pred_out_explanation = explainForecastBehavior(behaviorRaw=behaviorRaw)
     # pred_test_explanation = describeForecastModelOnTest(mape, about="forecast")
+    explanation_out_dict = describeOutForecast_univariate(
+        forecast=pred_out, col=df.columns[0], description=description
+    )
+
+    error = test_data.iloc[:, -1] - pred_test.iloc[:, -1]
+    explanation_test_dict = describeTestForecast(
+        forecast=pred_test,
+        cols=df.columns,
+        metrics=metric.values,
+        error=error,
+        description=description,
+    )
+
+    print(f"metrics ------------------------------ from backtesting{metric.values}")
     # ==========================================================
+    mae = mean_absolute_error(test_data.iloc[:, -1], pred_test)
+    mse = mean_squared_error(test_data.iloc[:, -1], pred_test)
+    rmse = np.sqrt(mse)
+    mape = mean_absolute_percentage_error(test_data.iloc[:, -1], pred_test)
+    # ==========================================================
+
     response = {
         "metadata": {
             "tstype": tsType,
@@ -319,13 +358,13 @@ def prepare_forecast_response_multivariate(
         "forecast": {
             "pred_out": pred_out_dict,
             "pred_test": pred_test_dict,
-            "pred_out_explanation": pred_out_explanation,
-            "pred_test_explanation": "lorem ipsum dolor ...",
+            "pred_out_explanation": explanation_out_dict,
+            "pred_test_explanation": explanation_test_dict,
             "metrics": {
-                "mae": 0,
-                "mse": 0,
-                "rmse": 0,
-                "mape": 0,
+                "mae": mae,
+                "mse": mse,
+                "rmse": rmse,
+                "mape": mape,
             },
         },
         "data": {

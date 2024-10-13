@@ -9,3 +9,4 @@ prophet
 google.generativeai
 ipython
 tabulate
+markdown2
