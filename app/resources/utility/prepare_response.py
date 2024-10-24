@@ -36,6 +36,11 @@ def prepare_trend_response_univariate(
         else:
             trend_dict[varname] = trend_df["trend"].to_list()
 
+    print(trend_dict)
+    explanations = describe_trend_univariate(
+        trend_result=trend_result, description=description
+    )
+
     response = {
         "metadata": {
             "tstype": "univariate",
@@ -45,7 +50,7 @@ def prepare_trend_response_univariate(
             "colname": col,
         },
         "trend": trend_dict,
-        "explanations": "lorem ipsum dorem ...",
+        "explanations": explanations,
     }
 
     return response
@@ -74,9 +79,12 @@ def prepare_trend_response_multivariate(
         else:
             trend_dict[varname] = trend_df["trend"].to_list()
 
-    explanations = {}
-    for col in cols:
-        explanations[col] = "lorem ipsum dolor"
+    # explanations = {}
+    # for col in cols:
+    #     explanations[col] = "lorem ipsum dolor"
+    explanations = describe_trend_multivariate(
+        trend_result=trend_result, cols=cols, description=description
+    )
 
     response = {
         "metadata": {
@@ -84,7 +92,7 @@ def prepare_trend_response_multivariate(
             "freq": freq,
             "description": description,
             "forecast_method": "without_refit",
-            "colname": cols,
+            "colname": df.columns.tolist(),
         },
         "trend": trend_dict,
         "explanations": explanations,
@@ -108,9 +116,12 @@ def prepare_seasonality_response_univariate(
             }
         seasonality_per_period_dict[varname] = temp_dict_new
 
-    explanations = {}
-    for component in components:
-        explanations[component] = "lorem ipsum dolor"
+    # explanations = {}
+    # for component in components:
+    #     explanations[component] = "lorem ipsum dolor"
+    explanations = describe_seasonality_univariate(
+        seasonality_per_period=seasonality_per_period, description=description
+    )
 
     response = {
         "metadata": {
@@ -144,12 +155,17 @@ def prepare_seasonality_response_multivariate(
             }
         seasonality_per_period_dict[varname] = temp_dict_new
 
-    explanations = {}
-    for component in components:
-        temp_dict = {}
-        for col in cols:
-            temp_dict[col] = f"lorem ipusum {col}"
-        explanations[component] = temp_dict
+    # explanations = {}
+    # for component in components:
+    #     temp_dict = {}
+    #     for col in cols:
+    #         temp_dict[col] = f"lorem ipusum {col}"
+    #     explanations[component] = temp_dict
+    explanations = describe_seasonality_multivariate(
+        seasonality_per_period=seasonality_per_period,
+        components=components,
+        description=description,
+    )
 
     response = {
         "metadata": {
