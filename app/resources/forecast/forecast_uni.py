@@ -17,7 +17,6 @@ from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Ridge
 
-
 # this is relative import
 # from seasonality_analysis import *
 # from models.stacking import *
@@ -26,7 +25,6 @@ from app.resources.models.stacking_uni import *
 
 def forecast_uni(df_arg, lag_value, steps_value, freq, forecast_method="without_refit"):
     df = df_arg.copy(deep=True)
-
     colname = df.columns[0]
 
     # we'll just use the corresponding row number as index.

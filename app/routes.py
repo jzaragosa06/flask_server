@@ -41,10 +41,14 @@ def forecast_univariate():
         steps = request.form.get("steps")
         forecastMethod = request.form.get("method")
 
-        hasGap = checkGap(df=df, freq=freq)
-        print("has gap? " + str(hasGap))
+        if freq not in ["D", "M", "Q", "Y"]:
+            return jsonify({"message": "Format of the index is unsupported"}), 500
 
-        lag = sig_lag(df, 50, ts_type="univariate")
+        hasGap = checkGap(df=df, freq=freq)
+
+        # lag = sig_lag(df, 50, ts_type="univariate")
+        # we'll use a default of 7
+        lag = 7
 
         if hasGap != True:
             if forecastMethod == "without_refit":
@@ -103,6 +107,8 @@ def forecast_univariate():
         except Exception as e:
             print(f"Error in preparing response: {e}")
             return jsonify({"message": f"Error in preparing response: {e}"}), 500
+    else:
+        return jsonify({"message": "No csv file included"}), 500
 
 
 @api.route("/forecast-multivariate", methods=["POST"])
@@ -123,7 +129,12 @@ def forecast_multivariate():
         steps = request.form.get("steps")
         forecastMethod = request.form.get("method")
 
+        if freq not in ["D", "M", "Q", "Y"]:
+            return jsonify({"message": "Format of the index is unsupported"}), 500
+
         # dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
+        # we'll use a default of 7
+        lag = 7
 
         hasGap = checkGap(df=df, freq=freq)
         print("has gap? " + str(hasGap))
@@ -186,9 +197,10 @@ def forecast_multivariate():
         except Exception as e:
             print(f"Error in preparing response: {e}")
             return jsonify({"message": f"Error in preparing response: {e}"}), 500
+    else:
+        return jsonify({"message": "No csv file included"}), 500
 
 
-# =============================================================================================================
 @api.route("/trend", methods=["POST"])
 def trend():
     file = request.files["inputFile"]
@@ -196,7 +208,6 @@ def trend():
     if file:
         try:
             df = pd.read_csv(file, index_col=0, parse_dates=True)
-            print(df.head())
         except Exception as e:
             print(f"Error loading DataFrame: {e}")
             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
@@ -208,8 +219,6 @@ def trend():
         date_column = df.index.name
         colnames = df.columns.to_list()
 
-        # extract trend and seasonality behaviour of the ts data.
-        # trend_result = (df_arg=df, ts_type=tsType, window_sizes=[5, 10, 20])
         trend_result = compute_trend_prophet(
             df_arg=df, date_column=date_column, value_columns=colnames, freq=freq
         )
@@ -233,6 +242,8 @@ def trend():
 
         print(response)
         return Response(json.dumps(response), mimetype="application/json")
+    else:
+        return jsonify({"message": "No csv file included"}), 500
 
 
 @api.route("/seasonality", methods=["POST"])
@@ -250,6 +261,9 @@ def seasonality():
         tsType = request.form.get("type")
         freq = request.form.get("freq")
         description = request.form.get("description")
+
+        if freq not in ["D", "M", "Q", "Y"]:
+            return jsonify({"message": "Format of the index is unsupported"}), 500
 
         date_column = df.index.name
         colnames = df.columns.to_list()
@@ -280,6 +294,8 @@ def seasonality():
             )
 
         return Response(json.dumps(response), mimetype="application/json")
+    else:
+        return jsonify({"message": "No csv file included"}), 500
 
 
 @api.route("/hello", methods=["GET"])
@@ -292,8 +308,6 @@ def llm():
     data = request.json  # This will correctly get the JSON payload
     message = data.get("message")
     about = data.get("about")
-    # message = request.form.get("message")
-    # about = request.form.get("about")
 
     print(message)
     print(f"about {about}")

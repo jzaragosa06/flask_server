@@ -73,7 +73,6 @@ def compute_seasonality_prophet(df_arg, date_column, value_columns, freq):
         elif freq == "Y":
             model = Prophet(yearly_seasonality=True, weekly_seasonality=False)
             components = ["yearly"]
-
         model.fit(df)
         temp_dict = {}
         # =====================================================================================

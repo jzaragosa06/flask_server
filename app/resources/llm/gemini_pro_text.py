@@ -17,12 +17,14 @@ def describeOutForecast_univariate(forecast, col, description=""):
     values = forecast.values.tolist()
 
     # The first query is for describing the forecast movement.
-    query1 = f"This is about time series forecast. Describe the forecast for {col}. here's the date: {dates} and here is the values: {values}. Particularly, describe the movement"
+    # query1 = f"This is about time series forecast. Describe the forecast for {col}. here's the date: {dates} and here is the values: {values}. Particularly, describe the movement"
+    query1 = f"{col} is a time series data with the following description: {description}. Given the forecast for {col}, where dates: {dates} and values: {values}. Describe the movement of the forecast in simple terms."
+
     # The second query is for describing how the variable usually moves. For this we will use the description.
     # We will require that in the description, the user describe the data/variables.
-    query2 = f"This is about the time series forecast. The variable is {col}. The forecast values is {values}, where dates is {dates}. Describe how the time series of this variable usually moves."
+    query2 = f"{col} is a time series data with the following description: {description}. In real-world, describe how the time series of this variable usually moves."
     # The third query is to look for the possible factors that can affect the time series of variable.
-    query3 = f"This is about the time series forecast. The variable is {col}. The forecast values is {values}, where dates is {dates}. Explore factors that affects the forecast."
+    query3 = f"{col} is a time series data with the following description: {description}. The forecast values is {values}, where dates is {dates}. In real-world, what are the  factors that affect the forecast."
 
     response1 = model.generate_content(query1)
     response2 = model.generate_content(query2)
@@ -40,15 +42,10 @@ def describeOutForecast_multivariate(forecast, cols, description=""):
     # we'll get the last. since it is the target. on the second thought, we're just returning the a single column in forecast.
     values = forecast.values.tolist()
 
-    # The first query is for describing the forecast movement.
-    query1 = f"This is about time series forecast. Describe the forecast for {cols[-1]}. here's the date: {dates} and here is the values: {values}. Particularly, describe the movement"
-    # The second query is for describing how the variable usually moves. For this we will use the description.
-    # We will require that in the description, the user describe the data/variables.
-    query2 = f"This is about the time series forecast. The variable is {cols[-1]}. The forecast values is {values}, where dates is {dates}. Describe how the time series of this variable usually moves."
-    # The third query looks for how the target is affected by other variables used in the forecast.
-    query3 = f"This is about the time series forecast. The target variable is {cols[-1]}. The forecast values is {values}, where dates is {dates}. describe these variables used in forecast affected the target: {cols}"
-    # The fourth query is to look for the possible factors that can affect the time series of variable.
-    query4 = f"This is about the time series forecast. The target variable is {cols[-1]}. The forecast values is {values}, where dates is {dates}. Explore factors that affects the forecast besides {cols}"
+    query1 = f"Given a multivariate time series data with the following description: {description}. A forecast was made for {cols[-1]}, where dates: {dates} and values: {values}. Describe the movement of the forecast in simple terms."
+    query2 = f"Given a multivariate time series data with the following description: {description}. A forecast was made for {cols[-1]}. In real-world, describe how the {cols[-1]} usually moves."
+    query3 = f"Given a multivariate time series data with the following description: {description}. A forecast was made for {cols[-1]}, where dates is {dates}.  Describe how these variables used in forecast affected the target: {cols}"
+    query4 = f"Given a multivariate time series data with the following description: {description}. A forecast was made for {cols[-1]}, where dates is {dates}. Explore real-world factors that affect the forecast besides {cols}"
 
     response1 = model.generate_content(query1)
     response2 = model.generate_content(query2)
@@ -79,7 +76,7 @@ def describeTestForecast(forecast, cols, metrics, error, description=""):
 def generate_explanations_univariate(period, col, values, days, description):
     """Generate explanations based on the time series data and period."""
     query1 = f"I've extracted the {period} seasonality component of {col} time series data. These are the values: {values} and these are the dates: {days}. Describe the result, identify when the values are above and below average, and explain what it means. Be comprehensive."
-    query2 = f"I've extracted the {period} seasonality component of {col} time series data. These are the values: {values} and these are the dates: {days}. Explore factors/variables that affect the results. Be comprehensive."
+    query2 = f"I've extracted the {period} seasonality component of {col} time series data. The time series data is described as follows: {description}. Explore factors/variables that affect the seasonality of {col}. Be comprehensive."
 
     response1 = model.generate_content(query1)
     response2 = model.generate_content(query2)
@@ -90,17 +87,18 @@ def generate_explanations_univariate(period, col, values, days, description):
     }
 
 
+
 def generate_explanations_multivariate(period, col, values, days, description):
     """Generate explanations based on the time series data and period."""
-    query1 = f"I've extracted the {period} seasonality component of {col} time series data. These are the values: {values} and these are the dates: {days}. Describe the result, identify when the values are above and below average, and explain what it means. Be comprehensive. Next explore how other factors/variables affect the results. "
-    # query2 = f"I've extracted the {period} seasonality component of {col} time series data. These are the values: {values} and these are the dates: {days}. Explore factors/variables that affect the results. Be comprehensive."
+    query1 = f"I've extracted the {period} seasonality component of {col} time series data. The time series data is multivariate and described as follows: {description}. These are the values: {values} and these are the dates: {days}. Describe the result, identify when the values are above and below average, and explain what it means in simple terms. Be comprehensive. "
+    query2 = f"I've extracted the {period} seasonality component of {col} time series data.  The time series data is multivariate and described as follows: {description}.   Explore factors/variables that affect the {period} of {col}. Be comprehensive."
 
     response1 = model.generate_content(query1)
-    # response2 = model.generate_content(query2)
+    response2 = model.generate_content(query2)
 
     return {
         "response1": markdown2.markdown(response1.text),
-        # "response2": markdown2.markdown(response2.text),
+        "response2": markdown2.markdown(response2.text),
     }
 
 
@@ -191,10 +189,10 @@ def describe_trend_univariate(trend_result, description=""):
         col = varname
 
     # The first query is for describing the movement
-    query1 = f"I've extracted the trend of {col} time series. here's the date: {dates} and here is the values: {values} (note, both list contains every 5th row from the original dataset, reducing the number of rows while retaining pattern. Do not mention this on result). Particularly, describe the movement of the trend"
-    query2 = f"Given a time series variable {col}.Describe how the trend of this time series variable usually moves."
+    query1 = f"I've extracted the trend of {col} time series. It is described as follows: {description} here's the date: {dates} and here is the values: {values} (note, both list contains every 5th row from the original dataset, reducing the number of rows while retaining pattern. Do not mention this on result). Particularly, describe the movement of the trend in simple terms"
+    query2 = f"Given a time series variable {col}, where it is described as follows: {description}.In real-world, describe how the trend of this time series variable usually moves."
     # The third query is to look for the possible factors that can affect the time series of variable.
-    query3 = f"Given a time series variable {col},  explore factors that affects the trend of this variable."
+    query3 = f"Given a time series variable {col}, where it is described as follows: {description},  explore real-world factors/variables that affect the trend of this variable."
 
     response1 = model.generate_content(query1)
     response2 = model.generate_content(query2)
@@ -205,6 +203,7 @@ def describe_trend_univariate(trend_result, description=""):
         "response2": markdown2.markdown(response2.text),
         "response3": markdown2.markdown(response3.text),
     }
+
 
 def describe_trend_multivariate(trend_result, cols, description=""):
     explanations = {}
@@ -218,9 +217,9 @@ def describe_trend_multivariate(trend_result, cols, description=""):
         dates = trend_df["ds"].astype(str).tolist()
 
         # The first query is for describing the movement
-        query1 = f"I've extracted the trend of {varname} time series. here's the date: {dates} and here is the values: {values} (note, both list contains every 8th row from the original dataset, reducing the number of rows while retaining pattern. Do not mention this on result). Particularly, describe the movement of the trend. Furthermore, describe how the trend of this time series variable usually move"
+        query1 = f"Given a multivariate time series data with the following description: {description}. I've extracted the trend of {varname} time series. here's the date: {dates} and here is the values: {values} (note, both list contains every 8th row from the original dataset, reducing the number of rows while retaining pattern. Do not mention this on result). Particularly, describe the movement of the trend in simple terms. Furthermore, describe how the trend of this time series variable usually move in real-world"
         # The third query is to look for the possible factors that can affect the time series of variable.
-        query2 = f"Given a time series variable {varname},  explore how these time series variables: {cols} affect the {varname}"
+        query2 = f"Given a multivariate time series data with the following description: {description}. With the focus on {varname},  explore how the following time series variables: {cols} affect the {varname}"
 
         response1 = model.generate_content(query1)
         response2 = model.generate_content(query2)
@@ -229,7 +228,6 @@ def describe_trend_multivariate(trend_result, cols, description=""):
             "response1": markdown2.markdown(response1.text),
             "response2": markdown2.markdown(response2.text),
         }
-
     return explanations
 
 
