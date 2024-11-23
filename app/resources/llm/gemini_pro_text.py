@@ -6,7 +6,7 @@ from app.resources.utility.dates import generate_list_of_dates
 
 model = genai.GenerativeModel("gemini-pro")
 
-api_key = "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs"
+api_key = "AIzaSyBZH4GcDNHPrCvDgEeuViAMns2nB4glbeM"
 genai.configure(api_key=api_key)
 
 
