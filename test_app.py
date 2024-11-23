@@ -402,13 +402,13 @@
 
 # # ===============================================================
 import requests
+import os
 
 # Define the URL for the forecast-univariate route
 url = "http://127.0.0.1:5000/api/forecast-univariate"
 
 # Define the file path to the CSV file you want to upload
-file_path = r"C:\Users\Gillian  Zaragosa\Documents\linkedInProjects\flask_server\test\data\monthly_gassprice.csv"
-
+file_path = os.path.join(os.getcwd(), "test", "data", "monthly_gassprice.csv")
 # Define other form data (based on what the endpoint expects)
 form_data = {
     "type": "univariate",  # Time series type

@@ -136,15 +136,18 @@ def evaluate_model_then_forecast_univariate(
 
     # train the model on all the data
     forecaster.fit(df.iloc[:, -1])
-    pred = forecaster.predict(steps=12)
+    pred = forecaster.predict(steps=steps_value)
+    print(f"pred: {pred}.......len: {len(pred)}")
 
     last_index = df_arg.index[-1]
     # the result of this is just a date without time. While the function that take into account
     # the occurence of gap uses DateTimeIndex
-    new_indices = pd.date_range(start=last_index, periods=steps_value + 1, freq=freq)[
+    new_indices = pd.date_range(start=last_index, periods=steps_value+1, freq=freq)[
         1:
     ]
     # new_indices = pd.to_datetime(new_indices)
+    
+    print(f"new_indices: {new_indices}.......len: {len(new_indices)}")
 
     # Create a new DataFrame of the result
     forecast_df = pd.DataFrame(
@@ -165,5 +168,6 @@ def evaluate_model_then_forecast_univariate(
         "mape": mape,
         "mse": mse,
         "rmse": rmse,
-        "forecast": forecast_df,
+        "pred_out": forecast_df,
+        "pred_test": predictions
     }
