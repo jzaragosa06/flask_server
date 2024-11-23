@@ -164,8 +164,6 @@ from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.linear_model import Ridge
-
-# from models.stacking import *
 from app.resources.models.stacking_multi import *
 
 

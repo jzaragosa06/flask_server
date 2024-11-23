@@ -104,6 +104,7 @@ def evaluate_model_uni(
     df = df_arg.copy(deep=True)
     colname = df.columns[0]
 
+
     # Ensure the DatetimeIndex has a frequency
     # df = df.asfreq(freq)
     # we'll just use the corresponding row number as index.

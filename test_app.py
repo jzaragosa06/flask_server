@@ -401,31 +401,31 @@
 
 
 # # ===============================================================
-# import requests
+import requests
 
-# # Define the URL for the forecast-univariate route
-# url = "http://127.0.0.1:5000/api/forecast-univariate"
+# Define the URL for the forecast-univariate route
+url = "http://127.0.0.1:5000/api/forecast-univariate"
 
-# # Define the file path to the CSV file you want to upload
-# file_path = r"C:\Users\Gillian  Zaragosa\Documents\linkedInProjects\flask_server\test\data\monthly_gassprice.csv"
+# Define the file path to the CSV file you want to upload
+file_path = r"C:\Users\Gillian  Zaragosa\Documents\linkedInProjects\flask_server\test\data\monthly_gassprice.csv"
 
-# # Define other form data (based on what the endpoint expects)
-# form_data = {
-#     "type": "univariate",  # Time series type
-#     "freq": "M",  # Frequency (e.g., daily "D", weekly "W", etc.)
-#     "description": "Monthly price (in $) of gasoline in the united states.",  # Description of the forecast
-#     "steps": "15",  # Number of forecast steps
-#     "method": "without_refit",  # Forecast method (e.g., "without_refit")
-# }
+# Define other form data (based on what the endpoint expects)
+form_data = {
+    "type": "univariate",  # Time series type
+    "freq": "M",  # Frequency (e.g., daily "D", weekly "W", etc.)
+    "description": "Monthly price (in $) of gasoline in the united states.",  # Description of the forecast
+    "steps": "15",  # Number of forecast steps
+    "method": "without_refit",  # Forecast method (e.g., "without_refit")
+}
 
-# # Open the CSV file and send the request
-# with open(file_path, "rb") as f:
-#     files = {"inputFile": f}
-#     response = requests.post(url, data=form_data, files=files)
+# Open the CSV file and send the request
+with open(file_path, "rb") as f:
+    files = {"inputFile": f}
+    response = requests.post(url, data=form_data, files=files)
 
-# # Print the response from the server
-# print("Status Code:", response.status_code)
-# print("Response JSON:", response.json())
+# Print the response from the server
+print("Status Code:", response.status_code)
+print("Response JSON:", response.json())
 # ===============================================================
 
 
@@ -515,28 +515,28 @@
 # ===============================================================
 
 
-import requests
+# import requests
 
-# Define the URL for the forecast-univariate route
-url = "http://127.0.0.1:5000/api/trend"
+# # Define the URL for the forecast-univariate route
+# url = "http://127.0.0.1:5000/api/trend"
 
-# Define the file path to the CSV file you want to upload
-file_path = r"C:\Users\Gillian  Zaragosa\Documents\linkedInProjects\flask_server\test\data\time_series-AAPL-1day (3)-unni.csv"
+# # Define the file path to the CSV file you want to upload
+# file_path = r"C:\Users\Gillian  Zaragosa\Documents\linkedInProjects\flask_server\test\data\time_series-AAPL-1day (3)-unni.csv"
 
-# Define other form data (based on what the endpoint expects)
-form_data = {
-    "type": "univariate",  # Time series type
-    "freq": "D",  # Frequency (e.g., daily "D", weekly "W", etc.)
-    "description": "Closing price ($) of Apple stocks",
-    "steps": "15",  # Number of forecast steps
-    "method": "without_refit",  # Forecast method (e.g., "without_refit")
-}
+# # Define other form data (based on what the endpoint expects)
+# form_data = {
+#     "type": "univariate",  # Time series type
+#     "freq": "D",  # Frequency (e.g., daily "D", weekly "W", etc.)
+#     "description": "Closing price ($) of Apple stocks",
+#     "steps": "15",  # Number of forecast steps
+#     "method": "without_refit",  # Forecast method (e.g., "without_refit")
+# }
 
-# Open the CSV file and send the request
-with open(file_path, "rb") as f:
-    files = {"inputFile": f}
-    response = requests.post(url, data=form_data, files=files)
+# # Open the CSV file and send the request
+# with open(file_path, "rb") as f:
+#     files = {"inputFile": f}
+#     response = requests.post(url, data=form_data, files=files)
 
-# Print the response from the server
-print("Status Code:", response.status_code)
-print("Response JSON:", response.json())
+# # Print the response from the server
+# print("Status Code:", response.status_code)
+# print("Response JSON:", response.json())

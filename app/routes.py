@@ -19,7 +19,10 @@ from app.resources.utility.prepare_response import *
 from app.resources.seasonality_analysis.seasonal import *
 from app.resources.llm.gemini_pro_text import *
 from app.resources.trend_prophet.trend import *
+from app.resources.evaluation_forecast.forecast_uni import *
+from app.resources.evaluation_forecast.forecast_multi import *
 
+from app.resources.utility.dates import *
 
 api = Blueprint("api", __name__)
 
@@ -46,24 +49,18 @@ def forecast_univariate():
 
         hasGap = checkGap(df=df, freq=freq)
 
-        # lag = sig_lag(df, 50, ts_type="univariate")
-        # we'll use a default of 7
+        # we'll use a default of 7. This will be overwritten
         lag = 7
+
+        exog = create_time_features(df=df, freq=freq)
 
         if hasGap != True:
             if forecastMethod == "without_refit":
-                metric, pred_test = evaluate_model_uni(
+                # from here, extract the metric, pred_test, pred_out
+                result = evaluate_model_then_forecast_univariate(
                     df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
-                    freq=freq,
-                    forecast_method="without_refit",
-                )
-
-                pred_out = forecast_uni(
-                    df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
+                    exog=exog,
+                    lag_value=lag,
                     freq=freq,
                     forecast_method="without_refit",
                 )
@@ -71,25 +68,7 @@ def forecast_univariate():
             gap_length, interval_length = identify_gap(df=df, freq=freq)
 
             if forecastMethod == "without_refit":
-                metric, pred_test = forecast_uni_with_gap(
-                    df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
-                    freq=freq,
-                    gap_length=gap_length,
-                    interval_length_before_gap=interval_length,
-                    forecast_method="without_refit",
-                )
-
-                pred_out = evaluate_model_uni_with_gap(
-                    df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
-                    freq=freq,
-                    gap_length=gap_length,
-                    interval_length_before_gap=interval_length,
-                    forecast_method="without_refit",
-                )
+                ...
         try:
             response = prepare_forecast_response_univariate(
                 df_arg=df,
@@ -296,11 +275,6 @@ def seasonality():
         return Response(json.dumps(response), mimetype="application/json")
     else:
         return jsonify({"message": "No csv file included"}), 500
-
-
-@api.route("/hello", methods=["GET"])
-def hello_world():
-    return jsonify(message="Hello, World!"), 200
 
 
 @api.route("/llm", methods=["POST"])
