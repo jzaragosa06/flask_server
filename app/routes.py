@@ -8,18 +8,16 @@ import json
 
 from app.resources.utility.lags import *
 
-from app.resources.forecast.forecast_uni import *
-from app.resources.forecast.forecast_uni_with_gap import *
-from app.resources.forecast.forecast_multi import *
-from app.resources.forecast.forecast_multi_with_gap import *
-
 from app.resources.utility.gap_functions import *
 from app.resources.utility.prepare_response import *
 
 from app.resources.seasonality_analysis.seasonal import *
 from app.resources.llm.gemini_pro_text import *
 from app.resources.trend_prophet.trend import *
+from app.resources.evaluation_forecast.forecast_uni import *
+# from app.resources.evaluation_forecast.forecast_multi import *
 
+from app.resources.utility.dates import *
 
 api = Blueprint("api", __name__)
 
@@ -44,63 +42,43 @@ def forecast_univariate():
         if freq not in ["D", "M", "Q", "Y"]:
             return jsonify({"message": "Format of the index is unsupported"}), 500
 
-        hasGap = checkGap(df=df, freq=freq)
-
-        # lag = sig_lag(df, 50, ts_type="univariate")
-        # we'll use a default of 7
+        # hasGap = checkGap(df=df, freq=freq)
+        hasGap = False
+        # we'll use a default of 7. This will be overwritten
         lag = 7
+
+        exog = create_time_features(df=df, freq=freq)
 
         if hasGap != True:
             if forecastMethod == "without_refit":
-                metric, pred_test = evaluate_model_uni(
+                # from here, extract the metric, pred_test, pred_out
+                result = evaluate_model_then_forecast_univariate(
                     df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
+                    exog=exog,
+                    lag_value=lag,
                     freq=freq,
+                    steps_value=int(steps), 
                     forecast_method="without_refit",
                 )
-
-                pred_out = forecast_uni(
-                    df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
-                    freq=freq,
-                    forecast_method="without_refit",
-                )
+                
+               
         else:
             gap_length, interval_length = identify_gap(df=df, freq=freq)
 
             if forecastMethod == "without_refit":
-                metric, pred_test = forecast_uni_with_gap(
-                    df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
-                    freq=freq,
-                    gap_length=gap_length,
-                    interval_length_before_gap=interval_length,
-                    forecast_method="without_refit",
-                )
-
-                pred_out = evaluate_model_uni_with_gap(
-                    df_arg=df,
-                    lag_value=int(lag),
-                    steps_value=int(steps),
-                    freq=freq,
-                    gap_length=gap_length,
-                    interval_length_before_gap=interval_length,
-                    forecast_method="without_refit",
-                )
+                ...
         try:
             response = prepare_forecast_response_univariate(
                 df_arg=df,
                 tsType=tsType,
                 freq=freq,
                 description=description,
-                steps=steps,
+                steps=int(steps),
                 forecastMethod=forecastMethod,
-                metric=metric,
-                pred_test=pred_test,
-                pred_out=pred_out,
+                metric=result["mape"],
+                pred_test=result["pred_test"],
+                pred_out=result["pred_out"],
+                result_dict = result,
             )
 
             return Response(json.dumps(response), mimetype="application/json")
@@ -111,94 +89,94 @@ def forecast_univariate():
         return jsonify({"message": "No csv file included"}), 500
 
 
-@api.route("/forecast-multivariate", methods=["POST"])
-def forecast_multivariate():
-    file = request.files["inputFile"]
+# @api.route("/forecast-multivariate", methods=["POST"])
+# def forecast_multivariate():
+#     file = request.files["inputFile"]
 
-    if file:
-        try:
-            df = pd.read_csv(file, index_col=0, parse_dates=True)
-            print(df.head())
-        except Exception as e:
-            print(f"Error loading DataFrame: {e}")
-            return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
+#     if file:
+#         try:
+#             df = pd.read_csv(file, index_col=0, parse_dates=True)
+#             print(df.head())
+#         except Exception as e:
+#             print(f"Error loading DataFrame: {e}")
+#             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
 
-        tsType = request.form.get("type")
-        freq = request.form.get("freq")
-        description = request.form.get("description")
-        steps = request.form.get("steps")
-        forecastMethod = request.form.get("method")
+#         tsType = request.form.get("type")
+#         freq = request.form.get("freq")
+#         description = request.form.get("description")
+#         steps = request.form.get("steps")
+#         forecastMethod = request.form.get("method")
 
-        if freq not in ["D", "M", "Q", "Y"]:
-            return jsonify({"message": "Format of the index is unsupported"}), 500
+#         if freq not in ["D", "M", "Q", "Y"]:
+#             return jsonify({"message": "Format of the index is unsupported"}), 500
 
-        # dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
-        # we'll use a default of 7
-        lag = 7
+#         # dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
+#         # we'll use a default of 7
+#         lag = 7
 
-        hasGap = checkGap(df=df, freq=freq)
-        print("has gap? " + str(hasGap))
+#         hasGap = checkGap(df=df, freq=freq)
+#         print("has gap? " + str(hasGap))
 
-        if hasGap != True:
-            if forecastMethod == "without_refit":
-                metric, pred_test = evaluate_model_multi(
-                    df_arg=df,
-                    # dict_lags=dict_lags,
-                    steps_value=int(steps),
-                    freq=freq,
-                    forecast_method="without_refit",
-                )
+#         if hasGap != True:
+#             if forecastMethod == "without_refit":
+#                 metric, pred_test = evaluate_model_multi(
+#                     df_arg=df,
+#                     # dict_lags=dict_lags,
+#                     steps_value=int(steps),
+#                     freq=freq,
+#                     forecast_method="without_refit",
+#                 )
 
-                pred_out = forecast_multi(
-                    df_arg=df,
-                    # dict_lags=dict_lags,
-                    steps_value=int(steps),
-                    freq=freq,
-                    forecast_method="without_refit",
-                )
-        else:
-            if forecastMethod == "without_refit":
-                gap_length, interval_length = identify_gap(df=df, freq=freq)
+#                 pred_out = forecast_multi(
+#                     df_arg=df,
+#                     # dict_lags=dict_lags,
+#                     steps_value=int(steps),
+#                     freq=freq,
+#                     forecast_method="without_refit",
+#                 )
+#         else:
+#             if forecastMethod == "without_refit":
+#                 gap_length, interval_length = identify_gap(df=df, freq=freq)
 
-                metric, pred_test = evaluate_model_multi_with_gap(
-                    df_arg=df,
-                    # dict_lags=dict_lags,
-                    steps_value=int(steps),
-                    freq=freq,
-                    gap_length=gap_length,
-                    interval_length_before_gap=interval_length,
-                    forecast_method="without_refit",
-                )
+#                 metric, pred_test = evaluate_model_multi_with_gap(
+#                     df_arg=df,
+#                     # dict_lags=dict_lags,
+#                     steps_value=int(steps),
+#                     freq=freq,
+#                     gap_length=gap_length,
+#                     interval_length_before_gap=interval_length,
+#                     forecast_method="without_refit",
+#                 )
 
-                pred_out = forecast_multi_with_gap(
-                    df_arg=df,
-                    # dict_lags=dict_lags,
-                    steps_value=int(steps),
-                    freq=freq,
-                    gap_length=gap_length,
-                    interval_length_before_gap=interval_length,
-                    forecast_method="without_refit",
-                )
-        try:
-            response = prepare_forecast_response_multivariate(
-                df_arg=df,
-                tsType=tsType,
-                freq=freq,
-                description=description,
-                steps=steps,
-                forecastMethod=forecastMethod,
-                metric=metric,
-                pred_test=pred_test,
-                pred_out=pred_out,
-            )
+#                 pred_out = forecast_multi_with_gap(
+#                     df_arg=df,
+#                     # dict_lags=dict_lags,
+#                     steps_value=int(steps),
+#                     freq=freq,
+#                     gap_length=gap_length,
+#                     interval_length_before_gap=interval_length,
+#                     forecast_method="without_refit",
+#                 )
+#         try:
+#             response = prepare_forecast_response_multivariate(
+#                 df_arg=df,
+#                 tsType=tsType,
+#                 freq=freq,
+#                 description=description,
+#                 steps=steps,
+#                 forecastMethod=forecastMethod,
+#                 metric=metric,
+#                 pred_test=pred_test,
+#                 pred_out=pred_out,
+#             )
 
-            print(response)
-            return Response(json.dumps(response), mimetype="application/json")
-        except Exception as e:
-            print(f"Error in preparing response: {e}")
-            return jsonify({"message": f"Error in preparing response: {e}"}), 500
-    else:
-        return jsonify({"message": "No csv file included"}), 500
+#             print(response)
+#             return Response(json.dumps(response), mimetype="application/json")
+#         except Exception as e:
+#             print(f"Error in preparing response: {e}")
+#             return jsonify({"message": f"Error in preparing response: {e}"}), 500
+#     else:
+#         return jsonify({"message": "No csv file included"}), 500
 
 
 @api.route("/trend", methods=["POST"])
@@ -296,11 +274,6 @@ def seasonality():
         return Response(json.dumps(response), mimetype="application/json")
     else:
         return jsonify({"message": "No csv file included"}), 500
-
-
-@api.route("/hello", methods=["GET"])
-def hello_world():
-    return jsonify(message="Hello, World!"), 200
 
 
 @api.route("/llm", methods=["POST"])

@@ -3,7 +3,7 @@ pandas
 flask
 scikit-learn
 flask_cors
-skforecast
+skforecast==0.13.0
 statsmodels
 prophet
 google.generativeai
