@@ -136,5 +136,6 @@ def evaluate_model_then_forecast_multivariate(
         "mape": mape_val,
         "mse": mse,
         "rmse": rmse,
-        "forecast": forecast_df,
+        "pred_out": forecast_df,
+        "pred_test": predictions,
     }

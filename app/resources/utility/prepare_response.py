@@ -200,33 +200,6 @@ def prepare_forecast_response_univariate(
     test_samples = int(test_size * len(df))
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
-    # pred_out_dict = fillMissing(pred_out)
-    # pred_out_dict["index"] = [
-    #     date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_out.index).to_list()
-    # ]
-
-    # pred_test_dict = fillMissing(pred_test).to_dict(orient="list")
-    # pred_test_dict["index"] = [
-    #     date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_test.index).to_list()
-    # ]
-
-    # train_data_dict = fillMissing(train_data).to_dict(orient="list")
-    # train_data_dict["index"] = [
-    #     date.strftime("%m/%d/%Y") for date in pd.to_datetime(train_data.index).to_list()
-    # ]
-
-    # test_data_dict = fillMissing(test_data).to_dict(orient="list")
-    # test_data_dict["index"] = [
-    #     date.strftime("%m/%d/%Y") for date in pd.to_datetime(test_data.index).to_list()
-    # ]
-
-    # df_dict = fillMissing(df).to_dict(orient="list")
-    # df_dict["index"] = [
-    #     date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
-    # ]
-    
-    
-    
     pred_out_dict = {col: pred_out[col].to_list() for col in pred_out.columns}
 
     pred_test_dict = {col: pred_test[col].to_list() for col in pred_test.columns}
@@ -234,7 +207,7 @@ def prepare_forecast_response_univariate(
     train_data_dict = {col: train_data[col].to_list() for col in train_data.columns}
 
     test_data_dict = {col: test_data[col].to_list() for col in test_data.columns}
-    
+
     df_dict = {col: df[col].to_list() for col in df.columns}
 
     # ==========================================================
@@ -317,36 +290,22 @@ def prepare_forecast_response_multivariate(
     metric,
     pred_test,
     pred_out,
+    result_dict,
 ):
     df = df_arg.copy(deep=True)
     test_size = 0.2
     test_samples = int(test_size * len(df))
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
-    pred_out_dict = fillMissing(pred_out).to_dict(orient="list")
-    pred_out_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_out.index).to_list()
-    ]
+    pred_out_dict = {col: pred_out[col].to_list() for col in pred_out.columns}
 
-    pred_test_dict = fillMissing(pred_test).to_dict(orient="list")
-    pred_test_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_test.index).to_list()
-    ]
+    pred_test_dict = {col: pred_test[col].to_list() for col in pred_test.columns}
 
-    train_data_dict = fillMissing(train_data).to_dict(orient="list")
-    train_data_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(train_data.index).to_list()
-    ]
+    train_data_dict = {col: train_data[col].to_list() for col in train_data.columns}
 
-    test_data_dict = fillMissing(test_data).to_dict(orient="list")
-    test_data_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(test_data.index).to_list()
-    ]
+    test_data_dict = {col: test_data[col].to_list() for col in test_data.columns}
 
-    df_dict = fillMissing(df).to_dict(orient="list")
-    df_dict["index"] = [
-        date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
-    ]
+    df_dict = {col: df[col].to_list() for col in df.columns}
 
     # ==========================================================
     # The above code snippet is written in Python and performs the following tasks:
@@ -363,17 +322,16 @@ def prepare_forecast_response_multivariate(
     explanation_test_dict = describeTestForecast(
         forecast=pred_test,
         cols=df.columns,
-        metrics=metric.values,
+        metrics=metric,
         error=error,
         description=description,
     )
 
-    print(f"metrics ------------------------------ from backtesting{metric.values}")
     # ==========================================================
-    mae = mean_absolute_error(test_data.iloc[:, -1], pred_test)
-    mse = mean_squared_error(test_data.iloc[:, -1], pred_test)
-    rmse = np.sqrt(mse)
-    mape = mean_absolute_percentage_error(test_data.iloc[:, -1], pred_test)
+    mae = result_dict["mae"]
+    mape = result_dict["mape"]
+    rmse = result_dict["rmse"]
+    mse = result_dict["mse"]
     # ==========================================================
 
     response = {

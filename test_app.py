@@ -401,48 +401,19 @@
 
 
 # # ===============================================================
-import requests
-import os
-
-# Define the URL for the forecast-univariate route
-url = "http://127.0.0.1:5000/api/forecast-univariate"
-
-# Define the file path to the CSV file you want to upload
-file_path = os.path.join(os.getcwd(), "test", "data", "monthly_gassprice.csv")
-# Define other form data (based on what the endpoint expects)
-form_data = {
-    "type": "univariate",  # Time series type
-    "freq": "M",  # Frequency (e.g., daily "D", weekly "W", etc.)
-    "description": "Monthly price (in $) of gasoline in the united states.",  # Description of the forecast
-    "steps": "15",  # Number of forecast steps
-    "method": "without_refit",  # Forecast method (e.g., "without_refit")
-}
-
-# Open the CSV file and send the request
-with open(file_path, "rb") as f:
-    files = {"inputFile": f}
-    response = requests.post(url, data=form_data, files=files)
-
-# Print the response from the server
-print("Status Code:", response.status_code)
-print("Response JSON:", response.json())
-# ===============================================================
-
-
-# # ===============================================================
 # import requests
+# import os
 
 # # Define the URL for the forecast-univariate route
-# url = "http://127.0.0.1:5000/api/forecast-multivariate"
+# url = "http://127.0.0.1:5000/api/forecast-univariate"
 
 # # Define the file path to the CSV file you want to upload
-# file_path = r"C:\Users\Gillian  Zaragosa\Documents\linkedInProjects\flask_server\test\data\monthly_gassprice - multi new.csv"
-
+# file_path = os.path.join(os.getcwd(), "test", "data", "monthly_gassprice.csv")
 # # Define other form data (based on what the endpoint expects)
 # form_data = {
-#     "type": "multivariate",  # Time series type
+#     "type": "univariate",  # Time series type
 #     "freq": "M",  # Frequency (e.g., daily "D", weekly "W", etc.)
-#     "description": "TransporationCostInDollar is the cost ($) in transporting one barrel of gasoline across the atlantic. MonthlyGasolinePriceInDollar is the monthly price (in $) of gasoline in the united states.",
+#     "description": "Monthly price (in $) of gasoline in the united states.",  # Description of the forecast
 #     "steps": "15",  # Number of forecast steps
 #     "method": "without_refit",  # Forecast method (e.g., "without_refit")
 # }
@@ -455,6 +426,38 @@ print("Response JSON:", response.json())
 # # Print the response from the server
 # print("Status Code:", response.status_code)
 # print("Response JSON:", response.json())
+# ===============================================================
+
+
+# # ===============================================================
+import requests
+import os
+
+# Define the URL for the forecast-univariate route
+url = "http://127.0.0.1:5000/api/forecast-multivariate"
+
+# Define the file path to the CSV file you want to upload
+file_path = os.path.join(
+    os.getcwd(), "test", "data", "monthly_gassprice - multi new.csv"
+)
+
+# Define other form data (based on what the endpoint expects)
+form_data = {
+    "type": "multivariate",  # Time series type
+    "freq": "M",  # Frequency (e.g., daily "D", weekly "W", etc.)
+    "description": "TransporationCostInDollar is the cost ($) in transporting one barrel of gasoline across the atlantic. MonthlyGasolinePriceInDollar is the monthly price (in $) of gasoline in the united states.",
+    "steps": "10",  # Number of forecast steps
+    "method": "without_refit",  # Forecast method (e.g., "without_refit")
+}
+
+# Open the CSV file and send the request
+with open(file_path, "rb") as f:
+    files = {"inputFile": f}
+    response = requests.post(url, data=form_data, files=files)
+
+# Print the response from the server
+print("Status Code:", response.status_code)
+print("Response JSON:", response.json())
 # # ===============================================================
 
 
