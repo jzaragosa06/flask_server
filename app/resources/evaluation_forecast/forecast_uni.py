@@ -141,14 +141,28 @@ def evaluate_model_then_forecast_univariate(
     last_index = df_arg.index[-1]
     # the result of this is just a date without time. While the function that take into account
     # the occurence of gap uses DateTimeIndex
-    new_indices = pd.date_range(start=last_index, periods=steps_value+1, freq=freq)[
+    new_indices = pd.date_range(start=last_index, periods=steps_value + 1, freq=freq)[
         1:
-    ]    
+    ]
 
     # Create a new DataFrame of the result
     forecast_df = pd.DataFrame(
         data=pred.values, index=new_indices, columns=[df_arg.columns[0]]
     )
+
+    print(f"preditions before..........{predictions}. ........{len(predictions)}")
+    print(
+        f"test: {pd.DataFrame(df_arg.iloc[-int(0.2 * len(df)) :])}.......len: {len(pd.DataFrame(df_arg.iloc[-int(0.2 * len(df)) :]))}"
+    )
+
+    predictions = pd.DataFrame(
+        data=predictions.values,
+        index=pd.DataFrame(df_arg.iloc[-int(0.2 * len(df) + 1) :]).index,
+        columns=[df_arg.columns[0]],
+    )
+
+    print(f"forecast: {forecast_df.head()}")
+    print(f"predictions: {predictions.head()}")
 
     # Display metrics
     print(f"MAE: {mae}")
@@ -165,5 +179,5 @@ def evaluate_model_then_forecast_univariate(
         "mse": mse,
         "rmse": rmse,
         "pred_out": forecast_df,
-        "pred_test": predictions
+        "pred_test": predictions,
     }

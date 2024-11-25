@@ -128,6 +128,17 @@ def evaluate_model_then_forecast_multivariate(
         data=pred.values, index=new_indices, columns=[df.columns[-1]]
     )
 
+    print(f"preditions before..........{predictions}. ........{len(predictions)}")
+    print(
+        f"test: {pd.DataFrame(df_arg.iloc[-int(0.2 * len(df)) :])}.......len: {len(pd.DataFrame(df_arg.iloc[-int(0.2 * len(df)) :]))}"
+    )
+
+    predictions = pd.DataFrame(
+        data=predictions.values,
+        index=pd.DataFrame(df_arg.iloc[-int(0.2 * len(df) + 1) :]).index,
+        columns=[df_arg.columns[-1]],
+    )
+
     # Return results as a dictionary
     return {
         "results_random_search": results_random_search,

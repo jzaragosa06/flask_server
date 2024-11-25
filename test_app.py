@@ -459,8 +459,19 @@ with open(file_path, "rb") as f:
 print("Status Code:", response.status_code)
 print("Response JSON:", response.json())
 # # ===============================================================
+# import pandas as pd
+# import os
 
+# df = pd.read_csv(
+#     os.path.join(os.getcwd(), "test", "data", "monthly_gassprice - multi new.csv"),
+#     index_col=0,
+#     parse_dates=True,
+# )
 
+# print(df.index.name)
+
+# df.index.name = "index"
+# print(df.index.name)
 # # ===============================================================
 # import requests
 

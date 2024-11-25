@@ -200,16 +200,40 @@ def prepare_forecast_response_univariate(
     test_samples = int(test_size * len(df))
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
-    pred_out_dict = {col: pred_out[col].to_list() for col in pred_out.columns}
+    # pred_out_dict = {col: pred_out[col].to_list() for col in pred_out.columns}
 
-    pred_test_dict = {col: pred_test[col].to_list() for col in pred_test.columns}
+    # pred_test_dict = {col: pred_test[col].to_list() for col in pred_test.columns}
 
-    train_data_dict = {col: train_data[col].to_list() for col in train_data.columns}
+    # train_data_dict = {col: train_data[col].to_list() for col in train_data.columns}
 
-    test_data_dict = {col: test_data[col].to_list() for col in test_data.columns}
+    # test_data_dict = {col: test_data[col].to_list() for col in test_data.columns}
 
-    df_dict = {col: df[col].to_list() for col in df.columns}
+    # df_dict = {col: df[col].to_list() for col in df.columns}
 
+    pred_out_dict = fillMissing(pred_out).to_dict(orient="list")
+    pred_out_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_out.index).to_list()
+    ]
+
+    pred_test_dict = fillMissing(pred_test).to_dict(orient="list")
+    pred_test_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_test.index).to_list()
+    ]
+
+    train_data_dict = fillMissing(train_data).to_dict(orient="list")
+    train_data_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(train_data.index).to_list()
+    ]
+
+    test_data_dict = fillMissing(test_data).to_dict(orient="list")
+    test_data_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(test_data.index).to_list()
+    ]
+
+    df_dict = fillMissing(df).to_dict(orient="list")
+    df_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
+    ]
     # ==========================================================
     # The above code snippet is written in Python and performs the following tasks:
     # here, we will extract the forecast explanation
@@ -297,15 +321,39 @@ def prepare_forecast_response_multivariate(
     test_samples = int(test_size * len(df))
     train_data, test_data = df.iloc[:-test_samples], df.iloc[-test_samples:]
 
-    pred_out_dict = {col: pred_out[col].to_list() for col in pred_out.columns}
+    # pred_out_dict = {col: pred_out[col].to_list() for col in pred_out.columns}
 
-    pred_test_dict = {col: pred_test[col].to_list() for col in pred_test.columns}
+    # pred_test_dict = {col: pred_test[col].to_list() for col in pred_test.columns}
 
-    train_data_dict = {col: train_data[col].to_list() for col in train_data.columns}
+    # train_data_dict = {col: train_data[col].to_list() for col in train_data.columns}
 
-    test_data_dict = {col: test_data[col].to_list() for col in test_data.columns}
+    # test_data_dict = {col: test_data[col].to_list() for col in test_data.columns}
 
-    df_dict = {col: df[col].to_list() for col in df.columns}
+    # df_dict = {col: df[col].to_list() for col in df.columns}
+    pred_out_dict = fillMissing(pred_out).to_dict(orient="list")
+    pred_out_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_out.index).to_list()
+    ]
+
+    pred_test_dict = fillMissing(pred_test).to_dict(orient="list")
+    pred_test_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(pred_test.index).to_list()
+    ]
+
+    train_data_dict = fillMissing(train_data).to_dict(orient="list")
+    train_data_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(train_data.index).to_list()
+    ]
+
+    test_data_dict = fillMissing(test_data).to_dict(orient="list")
+    test_data_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(test_data.index).to_list()
+    ]
+
+    df_dict = fillMissing(df).to_dict(orient="list")
+    df_dict["index"] = [
+        date.strftime("%m/%d/%Y") for date in pd.to_datetime(df.index).to_list()
+    ]
 
     # ==========================================================
     # The above code snippet is written in Python and performs the following tasks:

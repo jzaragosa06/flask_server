@@ -28,7 +28,9 @@ def forecast_univariate():
     if file:
         try:
             df = pd.read_csv(file, index_col=0, parse_dates=True)
+            df.index.name = "index"
             print(df.head())
+
         except Exception as e:
             print(f"Error loading DataFrame: {e}")
             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
@@ -95,6 +97,7 @@ def forecast_multivariate():
     if file:
         try:
             df = pd.read_csv(file, index_col=0, parse_dates=True)
+            df.index.name = "index"
             print(df.head())
         except Exception as e:
             print(f"Error loading DataFrame: {e}")
