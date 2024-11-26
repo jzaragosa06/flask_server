@@ -3,14 +3,23 @@ import textwrap
 import google.generativeai as genai
 import markdown2
 from app.resources.utility.dates import generate_list_of_dates
+import random as random
 
 model = genai.GenerativeModel("gemini-pro")
-
-api_key = "AIzaSyBZH4GcDNHPrCvDgEeuViAMns2nB4glbeM"
+"""
+We can configure this part to use an api key by random.
+"""
+# api_key_list = [
+#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
+#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
+#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
+#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
+# ]
+# api_key = api_key_list[random.randint(1, 4)]
+api_key = "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY"
 genai.configure(api_key=api_key)
 
 
-# =================================================================================================
 def describeOutForecast_univariate(forecast, col, description=""):
     dates = forecast.index.strftime("%m-%d-%Y").tolist()
     # we'll get the last.
@@ -72,7 +81,6 @@ def describeTestForecast(forecast, cols, metrics, error, description=""):
     }
 
 
-# =================================================================================================
 def generate_explanations_univariate(period, col, values, days, description):
     """Generate explanations based on the time series data and period."""
     query1 = f"I've extracted the {period} seasonality component of {col} time series data. These are the values: {values} and these are the dates: {days}. Describe the result, identify when the values are above and below average, and explain what it means. Be comprehensive."
@@ -85,7 +93,6 @@ def generate_explanations_univariate(period, col, values, days, description):
         "response1": markdown2.markdown(response1.text),
         "response2": markdown2.markdown(response2.text),
     }
-
 
 
 def generate_explanations_multivariate(period, col, values, days, description):
@@ -176,7 +183,6 @@ def describe_seasonality_multivariate(
     return explanations
 
 
-# =================================================================================================
 def describe_trend_univariate(trend_result, description=""):
     col = None
     for varname, trend_df in trend_result.items():
@@ -231,13 +237,30 @@ def describe_trend_multivariate(trend_result, cols, description=""):
     return explanations
 
 
-# =================================================================================================
-
-
 # return response.text
 def answerMessage(message, about, text_result="None"):
     # we can extract the 'about' i.e., trend, seasonality, forecast from the screen.
     query = f"Answer this question: {message}."
+    response = model.generate_content(query)
+    text = markdown2.markdown(response.text)
+
+    return text
+
+
+def answer_message_given_description(
+    message, about, text_result="None", description="unavailable"
+):
+    """
+    This function answers user queries by leveraging the description of the input
+    time series data, even if the exact answer is not directly included in the description.
+    """
+    query = (
+        f"The time series data is described as follows (though specific values are not included): {description}. "
+        f"Please analyze context implied by this description to answer the question: {message}. "
+        f"If the description lacks sufficient information, make an informed attempt to provide an answer based on related knowledge. Do not return a 'I cannot find enough information...'"
+    )
+    print(query)
+
     response = model.generate_content(query)
     text = markdown2.markdown(response.text)
 

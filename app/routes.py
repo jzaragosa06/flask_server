@@ -260,12 +260,15 @@ def llm():
     data = request.json  # This will correctly get the JSON payload
     message = data.get("message")
     about = data.get("about")
+    description = data.get("description")
 
     print(message)
     print(f"about {about}")
 
     # this returns a raw text
-    response = answerMessage(message=message, about=about)
+    response = answer_message_given_description(
+        message=message, about=about, description=description
+    )
 
     print(response)
 
