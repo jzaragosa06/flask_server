@@ -9,15 +9,14 @@ model = genai.GenerativeModel("gemini-pro")
 """
 We can configure this part to use an api key by random.
 """
-# api_key_list = [
-#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
-#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
-#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
-#     "AIzaSyDUFnIcM040z-zIN-d5EL4FGzOj_Ps5ybs",
-# ]
-# api_key = api_key_list[random.randint(1, 4)]
-api_key = "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY"
+api_key_list = [
+    "AIzaSyCEblOE8GvFqAm0E3qml49PGlbsSMIywA0",
+    "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY",
+]
+api_key = api_key_list[random.randint(0, 1)]
+# api_key = "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY"
 genai.configure(api_key=api_key)
+print(api_key)
 
 
 def describeOutForecast_univariate(forecast, col, description=""):
