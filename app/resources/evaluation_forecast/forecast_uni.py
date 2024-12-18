@@ -71,6 +71,7 @@ def evaluate_model_then_forecast_univariate(
         metric="mean_squared_error",
         initial_train_size=int(len(df) * 0.8),
         fixed_train_size=False,
+        refit=True, # this will perform a backtesting on different split, where the model refit every increase in training size. 
         return_best=True,
         random_state=123,
         verbose=True,
@@ -180,4 +181,5 @@ def evaluate_model_then_forecast_univariate(
         "rmse": rmse,
         "pred_out": forecast_df,
         "pred_test": predictions,
+        
     }

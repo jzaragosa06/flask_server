@@ -68,6 +68,7 @@ def evaluate_model_then_forecast_multivariate(
         n_iter=10,
         metric="mean_squared_error",
         initial_train_size=int(len(df) * 0.8),
+        refit=True, # this will perform a backtesting on different split, where the model refit every increase in training size.
         fixed_train_size=False,
         return_best=True,  # Return the best parameter set
         random_state=123,
