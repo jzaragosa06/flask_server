@@ -5,9 +5,7 @@ from flask_cors import CORS
 import io
 import json
 
-
 from app.resources.utility.lags import *
-
 from app.resources.utility.gap_functions import *
 from app.resources.utility.prepare_response import *
 
@@ -46,7 +44,6 @@ def forecast_univariate():
 
         # hasGap = checkGap(df=df, freq=freq)
         hasGap = False
-        # we'll use a default of 7. This will be overwritten
         lag = 7
 
         exog = create_time_features(df=df, freq=freq)
