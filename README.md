@@ -42,6 +42,9 @@ forecaster = ForecasterAutoreg(
 
 ```
 
+The hybrid model which uses the stacking regression can be visualized using the diagram below: 
+![stacking regression](https://miro.medium.com/v2/resize:fit:1050/1*DM1DhgvG3UCEZTF-Ev5Q-A.png)
+
 We used `skforecast` package to transform this model into a forecasting model. To optimize the hybrid model specific for a time series data, we perform a hyperparameter tuning using random search for the parameters of the models. We use `Mean Squared Error` as metric.
 
 ```python
@@ -78,8 +81,8 @@ search_results = random_search_forecaster(
 )
 
 ```
-
-To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True). This
+To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True). 
+we started with the 80% of the training and 20% of the testing and incrementally increase the training set and reduce the testing set. 
 
 ![time series backtesting with refit](https://skforecast.org/0.13.0/img/backtesting_refit.gif)
 
@@ -99,5 +102,47 @@ forecaster = ForecasterAutoregMultiVariate(
     transformer_series=StandardScaler(),
     transformer_exog=StandardScaler(),
 )
-
 ```
+The decision tree  can be visualized using the diagram below: 
+![decision tree regression](https://www.researchgate.net/publication/348456545/figure/fig1/AS:981743439994883@1611077284634/Schematic-of-a-Decision-Tree-The-figure-shows-an-example-of-a-decision-tree-with-3.png)
+
+
+We used `skforecast` package to transform this model into a forecasting model. To optimize the hybrid model specific for a time series data, we perform a hyperparameter tuning using random search for the parameters of the models. We use `Mean Squared Error` as metric.
+
+```python
+param_grid = {
+    "max_depth": [3, 5, 10, None],  # Depth of the tree
+    "min_samples_split": [2, 5, 10],  # Minimum samples to split a node
+    "min_samples_leaf": [1, 2, 4],  # Minimum samples per leaf
+    "max_features": [
+        None,
+        "sqrt",
+        "log2",
+    ],  # Number of features to consider for split
+}
+
+# Perform random search to find the best hyperparameters
+results_random_search = random_search_forecaster_multivariate(
+    forecaster=forecaster,
+    series=df,  # The column of time series data
+    param_distributions=param_grid,
+    lags_grid=[3, 5, 7, 12, 14],
+    steps=10,
+    exog=exog,
+    n_iter=10,
+    metric="mean_squared_error",
+    initial_train_size=int(len(df) * 0.8),
+    refit=True, # this will perform a backtesting on different split, where the model refit every increase in training size.
+    fixed_train_size=False,
+    return_best=True,  # Return the best parameter set
+    random_state=123,
+)
+```
+To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True). 
+we started with the 80% of the training and 20% of the testing and incrementally increase the training set and reduce the testing set. 
+
+![time series backtesting with refit](https://skforecast.org/0.13.0/img/backtesting_refit.gif)
+
+The result of this random search is a model with the lowest error.
+we Then use this model to forecast the future values of the time series.
+
