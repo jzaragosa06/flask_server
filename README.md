@@ -19,7 +19,17 @@ The following describe the routes to access the API functionality. Note that the
 
 ## About Univariate Time Series Forecasting
 
-For this we are using a hybrid model which uses stacking regression. Lasso and ElasticNet from sklearn.linear_model and DecisionTreeRegressor from sklearn.tree are used as base-models, while Ridge from sklearn.linear_model is used for meta-model. These models were selected based on the is based on the findings of our research/capstone.
+For univariate forecasting, we employ a **hybrid model** using **stacking regression**. The base models include:
+
+- **Lasso** (`sklearn.linear_model.Lasso`)
+- **ElasticNet** (`sklearn.linear_model.ElasticNet`)
+- **DecisionTreeRegressor** (`sklearn.tree.DecisionTreeRegressor`)
+
+The meta-model is:
+
+- **Ridge Regression** (`sklearn.linear_model.Ridge`)
+
+These models were selected based on research findings.
 
 ```python
 base_estimators = [
@@ -42,10 +52,10 @@ forecaster = ForecasterAutoreg(
 
 ```
 
-The hybrid model which uses the stacking regression can be visualized using the diagram below: 
+The hybrid model which uses the stacking regression can be visualized using the diagram below:
 ![stacking regression](https://miro.medium.com/v2/resize:fit:1050/1*DM1DhgvG3UCEZTF-Ev5Q-A.png)
 
-We used `skforecast` package to transform this model into a forecasting model. To optimize the hybrid model specific for a time series data, we perform a hyperparameter tuning using random search for the parameters of the models. We use `Mean Squared Error` as metric.
+We used `skforecast` package to transform this model into a forecasting model. To optimize the hybrid model specific for a time series data, we perform a hyperparameter tuning using random search for the parameters of the models. We use `Mean Squared Error` as metric. The data are normalized using the StandardScaler from `sklearn.preprocessing`
 
 ```python
 param_grid = {
@@ -81,8 +91,9 @@ search_results = random_search_forecaster(
 )
 
 ```
-To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True). 
-we started with the 80% of the training and 20% of the testing and incrementally increase the training set and reduce the testing set. 
+
+To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True).
+we started with the 80% of the training and 20% of the testing and incrementally increase the training set and reduce the testing set.
 
 ![time series backtesting with refit](https://skforecast.org/0.13.0/img/backtesting_refit.gif)
 
@@ -103,11 +114,11 @@ forecaster = ForecasterAutoregMultiVariate(
     transformer_exog=StandardScaler(),
 )
 ```
-The decision tree  can be visualized using the diagram below: 
+
+The decision tree can be visualized using the diagram below:
 ![decision tree regression](https://www.researchgate.net/publication/348456545/figure/fig1/AS:981743439994883@1611077284634/Schematic-of-a-Decision-Tree-The-figure-shows-an-example-of-a-decision-tree-with-3.png)
 
-
-We used `skforecast` package to transform this model into a forecasting model. To optimize the hybrid model specific for a time series data, we perform a hyperparameter tuning using random search for the parameters of the models. We use `Mean Squared Error` as metric.
+We used `skforecast` package to transform this model into a forecasting model. To optimize the hybrid model specific for a time series data, we perform a hyperparameter tuning using random search for the parameters of the models. We use `Mean Squared Error` as metric.The data are normalized using the StandardScaler from `sklearn.preprocessing`
 
 ```python
 param_grid = {
@@ -138,11 +149,11 @@ results_random_search = random_search_forecaster_multivariate(
     random_state=123,
 )
 ```
-To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True). 
-we started with the 80% of the training and 20% of the testing and incrementally increase the training set and reduce the testing set. 
+
+To make the search more robust, we are performing backtesting on different split (i.e., by setting the refit parameter to True).
+we started with the 80% of the training and 20% of the testing and incrementally increase the training set and reduce the testing set.
 
 ![time series backtesting with refit](https://skforecast.org/0.13.0/img/backtesting_refit.gif)
 
 The result of this random search is a model with the lowest error.
 we Then use this model to forecast the future values of the time series.
-
