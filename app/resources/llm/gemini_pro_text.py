@@ -9,12 +9,14 @@ model = genai.GenerativeModel("gemini-pro")
 """
 We can configure this part to use an api key by random.
 """
-api_key_list = [
-    "AIzaSyCEblOE8GvFqAm0E3qml49PGlbsSMIywA0",
-    "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY",
-]
-api_key = api_key_list[random.randint(0, 1)]
-# api_key = "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY"
+# api_key_list = [
+#     "AIzaSyCEblOE8GvFqAm0E3qml49PGlbsSMIywA0",
+#     "AIzaSyAEE3jCVfBhskwmAEWF5HNsrIlqIK6ukKY",
+# ]
+# api_key = api_key_list[random.randint(0, 1)]
+
+
+api_key = "AIzaSyD_q8OD37k1Y5dpMLcouaxQR7eyxZagSbk"
 genai.configure(api_key=api_key)
 print(api_key)
 

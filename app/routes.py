@@ -22,49 +22,47 @@ api = Blueprint("api", __name__)
 
 @api.route("/forecast-univariate", methods=["POST"])
 def forecast_univariate():
+    tsType = request.form.get("type")
+    freq = request.form.get("freq")
+    description = request.form.get("description")
+    steps = request.form.get("steps")
+    forecastMethod = request.form.get("method")
+
+    if freq not in ["D", "M", "Q", "Y"]:
+        return jsonify({"message": "Format of the index is unsupported"}), 500
+
     file = request.files["inputFile"]
     if file:
         try:
             df = pd.read_csv(file, index_col=0, parse_dates=True)
             df.index.name = "index"
+            df = df.loc[~df.index.duplicated(keep="first")]
+
+            # fill missing values: forward fill
+            df = df.ffill()
+            # enforce frequency
+            df = df.asfreq(freq=freq, method="ffill")
+
             print(df.head())
 
         except Exception as e:
             print(f"Error loading DataFrame: {e}")
             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
 
-        tsType = request.form.get("type")
-        freq = request.form.get("freq")
-        description = request.form.get("description")
-        steps = request.form.get("steps")
-        forecastMethod = request.form.get("method")
-
-        if freq not in ["D", "M", "Q", "Y"]:
-            return jsonify({"message": "Format of the index is unsupported"}), 500
-
-        # hasGap = checkGap(df=df, freq=freq)
-        hasGap = False
         lag = 7
-
         exog = create_time_features(df=df, freq=freq)
 
-        if hasGap != True:
-            if forecastMethod == "without_refit":
-                # from here, extract the metric, pred_test, pred_out
-                result = evaluate_model_then_forecast_univariate(
-                    df_arg=df,
-                    exog=exog,
-                    lag_value=lag,
-                    freq=freq,
-                    steps_value=int(steps),
-                    forecast_method="without_refit",
-                )
+        if forecastMethod == "without_refit":
+            # from here, extract the metric, pred_test, pred_out
+            result = evaluate_model_then_forecast_univariate(
+                df_arg=df,
+                exog=exog,
+                lag_value=lag,
+                freq=freq,
+                steps_value=int(steps),
+                forecast_method="without_refit",
+            )
 
-        else:
-            gap_length, interval_length = identify_gap(df=df, freq=freq)
-
-            if forecastMethod == "without_refit":
-                ...
         try:
             response = prepare_forecast_response_univariate(
                 df_arg=df,
@@ -89,49 +87,47 @@ def forecast_univariate():
 
 @api.route("/forecast-multivariate", methods=["POST"])
 def forecast_multivariate():
-    file = request.files["inputFile"]
+    tsType = request.form.get("type")
+    freq = request.form.get("freq")
+    description = request.form.get("description")
+    steps = request.form.get("steps")
+    forecastMethod = request.form.get("method")
 
+    if freq not in ["D", "M", "Q", "Y"]:
+        return jsonify({"message": "Format of the index is unsupported"}), 500
+
+    file = request.files["inputFile"]
     if file:
         try:
             df = pd.read_csv(file, index_col=0, parse_dates=True)
             df.index.name = "index"
+            df = df.loc[~df.index.duplicated(keep="first")]
+
+            # fill missing values: forward fill
+            df = df.ffill()
+            # enforce frequency
+            df = df.asfreq(freq=freq, method="ffill")
+
             print(df.head())
         except Exception as e:
             print(f"Error loading DataFrame: {e}")
             return jsonify({"message": f"Error loading DataFrame: {e}"}), 500
 
-        tsType = request.form.get("type")
-        freq = request.form.get("freq")
-        description = request.form.get("description")
-        steps = request.form.get("steps")
-        forecastMethod = request.form.get("method")
-
-        if freq not in ["D", "M", "Q", "Y"]:
-            return jsonify({"message": "Format of the index is unsupported"}), 500
-
         # dict_lags, lag_list = sig_lag(df, 50, ts_type="multivariate")
         # we'll use a default of 7
         lag = 7
-
         exog = create_time_features(df=df, freq=freq)
 
-        # hasGap = checkGap(df=df, freq=freq)
-        # print("has gap? " + str(hasGap))
-        hasGap = False
+        if forecastMethod == "without_refit":
+            result = evaluate_model_then_forecast_multivariate(
+                df_arg=df,
+                exog=exog,
+                lag_value=lag,
+                steps_value=int(steps),
+                freq=freq,
+                forecast_method="without_refit",
+            )
 
-        if hasGap != True:
-            if forecastMethod == "without_refit":
-                result = evaluate_model_then_forecast_multivariate(
-                    df_arg=df,
-                    exog=exog,
-                    lag_value=lag,
-                    steps_value=int(steps),
-                    freq=freq,
-                    forecast_method="without_refit",
-                )
-        else:
-            if forecastMethod == "without_refit":
-                ...
         try:
             response = prepare_forecast_response_multivariate(
                 df_arg=df,
